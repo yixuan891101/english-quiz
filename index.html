@@ -115,7 +115,7 @@
 
     @media (max-width: 700px) { .options-grid { grid-template-columns: 1fr; } .vocab-list { grid-template-columns: 1fr; } .header { padding: 15px; } }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes slideDown { from { opacity: 0; max-height: 0; } to { opacity: 1; max-height: 3000px; } }
+    @keyframes slideDown { from { opacity: 0; max-height: 0; } to { opacity: 1; max-height: 4000px; } }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 </style>
 </head>
@@ -251,11 +251,11 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbwSc3A0RoFNNxq41PbdkSh1gFEbJ5F1bCiaHPktmedZ7Dy0vIhJkj12zZ2DFDGGM3OqhQ/exec"; 
 
 // ============================================
-// 完整資料庫 (205 題 - DeepSeek 110 + Robots 95)
+// 完整資料庫 (205 題)
 // ============================================
 const database = {
     deepseek: [
-        {w: "Artificial Intelligence", z: "人工智慧", s: "[_____] helps businesses automate customer service through chatbots.", st: "<span class='hl'>人工智慧</span> 透過聊天機器人幫助企業自動化客戶服務。"},
+        {w: "Artificial Intelligence", z: "人工智慧", s: "[_____] helps businesses automate customer service through chatbots.", st: "<span class='hl'>人工智慧</span> 幫助企業透過聊天機器人自動化客戶服務。"},
         {w: "To make waves", z: "引起轟動", s: "The new AI company is [_____] with its groundbreaking technology.", st: "這家新 AI 公司憑藉其突破性技術在業界 <span class='hl'>引起轟動</span>。"},
         {w: "DeepSeek", z: "DeepSeek (公司名)", s: "[_____] has introduced a powerful AI model that challenges industry leaders.", st: "<span class='hl'>DeepSeek</span> 推出了一款強大的 AI 模型，挑戰了行業領導者。"},
         {w: "Lab", z: "實驗室", s: "The AI [_____] is working on new algorithms to improve machine learning.", st: "該 AI <span class='hl'>實驗室</span> 正在研究新算法以改進機器學習。"},
@@ -277,6 +277,7 @@ const database = {
         {w: "Ambitions", z: "雄心/野心", s: "The company’s [_____] include becoming a leader in AI research.", st: "該公司的 <span class='hl'>雄心</span> 包括成為 AI 研究的領導者。"},
         {w: "Founded", z: "創立", s: "DeepSeek was [_____] by a group of AI researchers in China.", st: "DeepSeek 是由中國的一群 AI 研究人員 <span class='hl'>創立</span> 的。"},
         {w: "Hedge fund", z: "對沖基金", s: "The [_____] invested millions in AI startups.", st: "該 <span class='hl'>對沖基金</span> 向 AI 新創公司投資了數百萬美元。"},
+        {w: "R1 model", z: "R1 模型", s: "The [_____] has shown impressive language processing capabilities.", st: "<span class='hl'>R1 模型</span> 展現了令人印象深刻的語言處理能力。"},
         {w: "Paper", z: "論文", s: "Their [_____] on AI ethics was widely discussed in the tech community.", st: "他們關於 AI 倫理的 <span class='hl'>論文</span> 在科技界引起了廣泛討論。"},
         {w: "Large language model", z: "大型語言模型", s: "GPT-4 is a well-known [_____] used for various applications.", st: "GPT-4 是一個著名的、用於各種應用的 <span class='hl'>大型語言模型</span>。"},
         {w: "Bootstrapped", z: "白手起家", s: "The startup was [_____] for years before receiving funding.", st: "這家新創公司在獲得融資前，多年來一直靠 <span class='hl'>自籌資金</span> 運作。"},
@@ -317,7 +318,7 @@ const database = {
         {w: "Frenzy", z: "狂熱", s: "The AI investment [_____] has led to skyrocketing stock prices.", st: "AI 投資 <span class='hl'>狂熱</span> 導致股價飛漲。"},
         {w: "Chipmaker", z: "晶片製造商", s: "Major [_____]s are racing to develop faster processors for AI.", st: "主要 <span class='hl'>晶片製造商</span> 正競相開發更快的 AI 處理器。"},
         {w: "Blind spot", z: "盲點", s: "Many companies have a [_____] when it comes to AI ethics.", st: "許多公司在 AI 倫理方面存在 <span class='hl'>盲點</span>。"},
-        {w: "To turn upside down", z: "徹底改變", s: "AI has [_____] the job market [_____] by automating many roles.", st: "AI 透過自動化許多職位，<span class='hl'>徹底改變</span> 了就業市場。"},
+        {w: "To turn something upside down", z: "徹底改變/顛覆", s: "AI has [_____] the job market [_____] by automating many roles.", st: "AI 透過自動化許多職位，<span class='hl'>徹底改變</span> 了就業市場。"},
         {w: "Wall Street", z: "華爾街", s: "[_____] is closely watching the rise of AI-driven businesses.", st: "<span class='hl'>華爾街</span> 正密切關注 AI 驅動企業的崛起。"},
         {w: "To drop", z: "下跌", s: "AI stocks [_____]ped sharply after the company’s disappointing earnings report.", st: "在公司令人失望的財報發布後，AI 股票大幅 <span class='hl'>下跌</span>。"},
         {w: "S&P 500", z: "標普500", s: "AI companies now make up a significant portion of the [_____].", st: "AI 公司現在佔據了 <span class='hl'>標普 500 指數</span> 的很大一部分。"},
