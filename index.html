@@ -698,6 +698,11 @@ function updateUserQuestionState(qSentence, newState) {
 function openModeModal(mode) {
     currentSelectedMode = mode;
     
+    // ★ 新增：打開測驗選單時，強制關閉單字表，避免畫面混亂
+    closeReading();
+    // ★ 新增：滾動到頁面最上方，確保使用者看得到彈窗
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
     // 1. 取得歷史最高分
     let stats = userQuizData["__STATS__"] || {};
     let highScore = stats[`${mode}_high`] || 0;
@@ -750,6 +755,9 @@ function startQuiz(mode, isReview) {
     currentMode = mode;
     isReviewMode = isReview;
     
+    // ★ 再次確保單字表是關閉的
+    closeReading();
+    
     let sourceData = database[mode];
     
     if (isReview) {
@@ -768,6 +776,9 @@ function startQuiz(mode, isReview) {
     document.getElementById('menu-screen').style.display = 'none';
     document.getElementById('result-screen').style.display = 'none';
     document.getElementById('quiz-screen').style.display = 'block';
+    
+    // ★ 進入測驗時，確保視窗捲動到最上方
+    window.scrollTo(0, 0);
     
     showQuestion();
 }
