@@ -57,6 +57,20 @@
     .close-reading-btn { width: 100%; padding: 10px; background: #eee; border: none; cursor: pointer; color: #555; border-radius: 0 0 8px 8px; font-weight: bold; }
     .close-reading-btn:hover { background: #e0e0e0; }
 
+    /* 模式選擇彈窗 (New) */
+    .modal-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 800; display: none; justify-content: center; align-items: center; animation: fadeIn 0.2s; }
+    .modal-box { background: white; padding: 30px; border-radius: 12px; width: 85%; max-width: 400px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+    .modal-title { font-size: 1.5em; color: var(--primary); margin-bottom: 10px; font-weight: bold; }
+    .modal-score { background: #fdf2e9; color: #d35400; padding: 10px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; display: inline-block; width: 100%; box-sizing: border-box; }
+    .modal-btn { display: block; width: 100%; padding: 12px; margin: 10px 0; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; transition: 0.2s; }
+    .btn-fresh { background: var(--accent); color: white; }
+    .btn-fresh:hover { background: #2980b9; }
+    .btn-review { background: #f39c12; color: white; }
+    .btn-review:hover { background: #d35400; }
+    .btn-review:disabled { background: #bdc3c7; cursor: not-allowed; opacity: 0.7; }
+    .btn-cancel { background: white; border: 1px solid #ccc; color: #7f8c8d; }
+    .btn-cancel:hover { background: #f5f5f5; }
+
     /* 測驗區 */
     #quiz-screen { display: none; }
     .header { background: #34495e; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
@@ -113,6 +127,23 @@
         <div id="loading-text">資料同步中...</div>
     </div>
 
+    <div id="mode-modal" class="modal-overlay">
+        <div class="modal-box">
+            <h2 id="modal-title" class="modal-title"></h2>
+            <div id="modal-score-box" class="modal-score"></div>
+            
+            <button class="modal-btn btn-fresh" onclick="confirmStart(false)">
+                🚀 從頭開始測驗
+            </button>
+            <button id="modal-review-btn" class="modal-btn btn-review" onclick="confirmStart(true)">
+                ↺ 複習錯誤或標記題目
+            </button>
+            <button class="modal-btn btn-cancel" onclick="closeModal()">
+                取消
+            </button>
+        </div>
+    </div>
+
     <div id="login-screen">
         <div class="login-box">
             <h2 style="color: var(--primary);">👋 歡迎使用</h2>
@@ -133,11 +164,11 @@
 
         <p class="subtitle" style="font-weight:bold; color:var(--primary);">🎯 請選擇測驗主題</p>
         <div class="btn-grid">
-            <button class="menu-btn" onclick="startQuiz('deepseek', false)">
+            <button class="menu-btn" onclick="openModeModal('deepseek')">
                 <h3>📈 測驗：DeepSeek & AI</h3>
                 <p>AI 市場趨勢、投資術語 (110 題)</p>
             </button>
-            <button class="menu-btn" onclick="startQuiz('robots', false)">
+            <button class="menu-btn" onclick="openModeModal('robots')">
                 <h3>🤖 測驗：Robotics</h3>
                 <p>機器人技術、自動化 (95 題)</p>
             </button>
@@ -220,7 +251,7 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbwSc3A0RoFNNxq41PbdkSh1gFEbJ5F1bCiaHPktmedZ7Dy0vIhJkj12zZ2DFDGGM3OqhQ/exec"; 
 
 // ============================================
-// 資料庫 (完整題庫)
+// 完整資料庫
 // ============================================
 const database = {
     deepseek: [
@@ -442,7 +473,7 @@ let currentQuiz = [];
 let currentIndex = 0;
 let score = 0;
 let currentMode = '';
-let isReviewMode = false;
+let currentSelectedMode = ''; // 用於 Modal 記錄使用者選擇的模式
 
 // 頁面載入
 window.onload = function() {
@@ -455,13 +486,11 @@ function toggleReading(source) {
     const contentContainer = document.getElementById('reading-table-container');
     const activeBtn = document.getElementById(`read-${source}-btn`);
 
-    // 如果點擊同一個按鈕且區域已開啟，則關閉
     if (displayArea.style.display === 'block' && displayArea.dataset.source === source) {
         closeReading();
         return;
     }
 
-    // 生成內容
     let data = source === 'deepseek' ? database.deepseek : database.robots;
     let title = source === 'deepseek' ? '📈 DeepSeek & AI 市場單字表' : '🤖 Robots & 自動化單字表';
     let color = source === 'deepseek' ? '#28a745' : '#28a745';
@@ -484,11 +513,9 @@ function toggleReading(source) {
     displayArea.style.display = 'block';
     displayArea.dataset.source = source;
     
-    // 更新按鈕樣式
     document.querySelectorAll('.read-btn').forEach(btn => btn.classList.remove('active'));
     activeBtn.classList.add('active');
     
-    // 平滑捲動到閱讀區
     displayArea.scrollIntoView({behavior: "smooth", block: "start"});
 }
 
@@ -600,6 +627,50 @@ function updateUserQuestionState(qSentence, newState) {
     saveUserData();
 }
 
+// 模式選擇 Modal 邏輯
+function openModeModal(mode) {
+    currentSelectedMode = mode;
+    
+    // 1. 取得歷史最高分
+    // 我們將統計數據存在 userQuizData["__STATS__"] 中
+    let stats = userQuizData["__STATS__"] || {};
+    let highScore = stats[`${mode}_high`] || 0;
+    let totalQuestions = database[mode].length;
+
+    // 2. 計算可複習題數
+    let reviewCount = database[mode].filter(item => {
+        const s = getUserQuestionState(item.s);
+        return s.marked || s.wrong;
+    }).length;
+
+    // 3. 更新 Modal 內容
+    const titleMap = { 'deepseek': '📈 DeepSeek & AI', 'robots': '🤖 Robotics' };
+    document.getElementById('modal-title').innerText = titleMap[mode];
+    document.getElementById('modal-score-box').innerHTML = `🏆 歷史最高分：<span style="font-size:1.2em">${highScore}</span> / ${totalQuestions}`;
+    
+    // 4. 設定複習按鈕狀態
+    const reviewBtn = document.getElementById('modal-review-btn');
+    if (reviewCount > 0) {
+        reviewBtn.disabled = false;
+        reviewBtn.innerHTML = `↺ 複習錯誤或標記題目 (${reviewCount} 題)`;
+    } else {
+        reviewBtn.disabled = true;
+        reviewBtn.innerHTML = `↺ 暫無可複習題目`;
+    }
+
+    // 5. 顯示 Modal
+    document.getElementById('mode-modal').style.display = 'flex';
+}
+
+function closeModal() {
+    document.getElementById('mode-modal').style.display = 'none';
+}
+
+function confirmStart(isReview) {
+    closeModal();
+    startQuiz(currentSelectedMode, isReview);
+}
+
 // 測驗邏輯
 function showMenu() {
     document.getElementById('display-name').innerText = currentUser;
@@ -622,11 +693,6 @@ function startQuiz(mode, isReview) {
         });
     } else {
         currentQuiz = [...sourceData];
-    }
-
-    if (currentQuiz.length === 0) {
-        alert("目前沒有需要複習的題目喔！(請先在一般測驗中標記或答錯題目)");
-        return;
     }
 
     currentQuiz.sort(() => Math.random() - 0.5);
@@ -759,8 +825,18 @@ function showResult() {
     document.getElementById('quiz-screen').style.display = 'none';
     document.getElementById('result-screen').style.display = 'block';
     
-    const finalScore = Math.round((score / currentQuiz.length) * 100);
-    document.getElementById('final-score').innerText = finalScore;
+    // 只有在「非複習模式」下才更新最高分
+    if (!isReviewMode) {
+        let stats = userQuizData["__STATS__"] || {};
+        let currentHigh = stats[`${currentMode}_high`] || 0;
+        if (score > currentHigh) {
+            stats[`${currentMode}_high`] = score;
+            userQuizData["__STATS__"] = stats;
+            saveUserData();
+        }
+    }
+    
+    document.getElementById('final-score').innerText = score;
     document.getElementById('final-msg').innerText = `您在 ${currentQuiz.length} 題中答對了 ${score} 題！`;
 
     const reviewCount = database[currentMode].filter(item => {
