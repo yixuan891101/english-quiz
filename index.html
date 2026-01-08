@@ -57,7 +57,7 @@
     .close-reading-btn { width: 100%; padding: 10px; background: #eee; border: none; cursor: pointer; color: #555; border-radius: 0 0 8px 8px; font-weight: bold; }
     .close-reading-btn:hover { background: #e0e0e0; }
 
-    /* 模式選擇彈窗 (New) */
+    /* 模式選擇彈窗 */
     .modal-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 800; display: none; justify-content: center; align-items: center; animation: fadeIn 0.2s; }
     .modal-box { background: white; padding: 30px; border-radius: 12px; width: 85%; max-width: 400px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
     .modal-title { font-size: 1.5em; color: var(--primary); margin-bottom: 10px; font-weight: bold; }
@@ -115,7 +115,7 @@
 
     @media (max-width: 700px) { .options-grid { grid-template-columns: 1fr; } .vocab-list { grid-template-columns: 1fr; } .header { padding: 15px; } }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes slideDown { from { opacity: 0; max-height: 0; } to { opacity: 1; max-height: 2000px; } }
+    @keyframes slideDown { from { opacity: 0; max-height: 0; } to { opacity: 1; max-height: 3000px; } }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 </style>
 </head>
@@ -251,7 +251,7 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbwSc3A0RoFNNxq41PbdkSh1gFEbJ5F1bCiaHPktmedZ7Dy0vIhJkj12zZ2DFDGGM3OqhQ/exec"; 
 
 // ============================================
-// 完整資料庫
+// 完整資料庫 (205 題)
 // ============================================
 const database = {
     deepseek: [
@@ -632,7 +632,6 @@ function openModeModal(mode) {
     currentSelectedMode = mode;
     
     // 1. 取得歷史最高分
-    // 我們將統計數據存在 userQuizData["__STATS__"] 中
     let stats = userQuizData["__STATS__"] || {};
     let highScore = stats[`${mode}_high`] || 0;
     let totalQuestions = database[mode].length;
@@ -836,7 +835,8 @@ function showResult() {
         }
     }
     
-    document.getElementById('final-score').innerText = score;
+    const finalScore = Math.round((score / currentQuiz.length) * 100);
+    document.getElementById('final-score').innerText = finalScore;
     document.getElementById('final-msg').innerText = `您在 ${currentQuiz.length} 題中答對了 ${score} 題！`;
 
     const reviewCount = database[currentMode].filter(item => {
