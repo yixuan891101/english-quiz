@@ -251,13 +251,13 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbwSc3A0RoFNNxq41PbdkSh1gFEbJ5F1bCiaHPktmedZ7Dy0vIhJkj12zZ2DFDGGM3OqhQ/exec"; 
 
 // ============================================
-// 完整資料庫 (205 題)
+// 完整資料庫 (205 題 - DeepSeek 110 + Robots 95)
 // ============================================
 const database = {
     deepseek: [
-        {w: "Artificial Intelligence", z: "人工智慧", s: "[_____] helps businesses automate customer service through chatbots.", st: "<span class='hl'>人工智慧</span> 幫助企業透過聊天機器人自動化客戶服務。"},
+        {w: "Artificial Intelligence", z: "人工智慧", s: "[_____] helps businesses automate customer service through chatbots.", st: "<span class='hl'>人工智慧</span> 透過聊天機器人幫助企業自動化客戶服務。"},
         {w: "To make waves", z: "引起轟動", s: "The new AI company is [_____] with its groundbreaking technology.", st: "這家新 AI 公司憑藉其突破性技術在業界 <span class='hl'>引起轟動</span>。"},
-        {w: "DeepSeek", z: "DeepSeek (公司名)", s: "[_____] has introduced a powerful AI model that challenges industry leaders.", st: "<span class='hl'>DeepSeek</span> 推出了一款強大的 AI 模型，挑戰行業領導者。"},
+        {w: "DeepSeek", z: "DeepSeek (公司名)", s: "[_____] has introduced a powerful AI model that challenges industry leaders.", st: "<span class='hl'>DeepSeek</span> 推出了一款強大的 AI 模型，挑戰了行業領導者。"},
         {w: "Lab", z: "實驗室", s: "The AI [_____] is working on new algorithms to improve machine learning.", st: "該 AI <span class='hl'>實驗室</span> 正在研究新算法以改進機器學習。"},
         {w: "To upend expectations", z: "顛覆預期", s: "DeepSeek’s new AI model has [_____] in the tech world.", st: "DeepSeek 的新 AI 模型 <span class='hl'>顛覆了預期</span>。"},
         {w: "To draw attention", z: "吸引注意", s: "The startup [_____] after announcing a major breakthrough in AI.", st: "這家新創公司在宣布 AI 的重大突破後 <span class='hl'>吸引了注意</span>。"},
@@ -473,7 +473,7 @@ let currentQuiz = [];
 let currentIndex = 0;
 let score = 0;
 let currentMode = '';
-let currentSelectedMode = ''; // 用於 Modal 記錄使用者選擇的模式
+let currentSelectedMode = ''; 
 
 // 頁面載入
 window.onload = function() {
