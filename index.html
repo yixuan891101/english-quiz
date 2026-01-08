@@ -21,18 +21,41 @@
     .start-btn:hover { background: #2980b9; transform: translateY(-2px); }
 
     /* 選單區 */
-    #menu-screen { padding: 50px 20px; text-align: center; display: none; }
+    #menu-screen { padding: 40px 20px; text-align: center; display: none; }
     h1 { color: var(--primary); margin-bottom: 10px; font-size: 2em; }
     .user-greeting { color: var(--accent); font-weight: bold; margin-bottom: 30px; font-size: 1.2em; }
     .logout-link { font-size: 0.9em; color: #95a5a6; cursor: pointer; text-decoration: underline; margin-left: 10px; }
     .status-badge { font-size: 0.8em; padding: 2px 8px; border-radius: 4px; margin-left: 5px; }
     .status-sync { background: #d5f5e3; color: #27ae60; }
     
+    .section-divider { margin: 40px 0 20px; border-top: 1px solid #eee; position: relative; }
+    .section-label { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: white; padding: 0 15px; color: #95a5a6; font-size: 0.9em; font-weight: bold; }
+
+    /* 按鈕網格 */
     .btn-grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); max-width: 800px; margin: 0 auto; }
+    
+    /* 測驗按鈕樣式 */
     .menu-btn { background: white; border: 2px solid #e0e0e0; padding: 30px; border-radius: 12px; cursor: pointer; transition: 0.3s; text-align: left; position: relative; }
     .menu-btn:hover { border-color: var(--accent); transform: translateY(-5px); box-shadow: 0 10px 20px rgba(52, 152, 219, 0.15); }
     .menu-btn h3 { margin: 0 0 10px 0; color: var(--accent); font-size: 1.4em; }
     .menu-btn p { margin: 0; color: #95a5a6; }
+
+    /* 閱讀區按鈕樣式 */
+    .read-btn { background: #f9fff9; border: 2px solid #c3e6cb; padding: 20px; border-radius: 12px; cursor: pointer; transition: 0.3s; text-align: left; }
+    .read-btn:hover { border-color: #28a745; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(40, 167, 69, 0.1); background: #f0fff4; }
+    .read-btn h3 { margin: 0 0 5px 0; color: #28a745; font-size: 1.2em; display: flex; align-items: center; gap: 10px; }
+    .read-btn p { margin: 0; color: #6c757d; font-size: 0.9em; }
+    .read-btn.active { background: #28a745; border-color: #28a745; }
+    .read-btn.active h3, .read-btn.active p { color: white; }
+
+    /* 閱讀內容顯示區 */
+    #reading-display-area { display: none; margin-top: 20px; text-align: left; animation: slideDown 0.3s ease; }
+    .vocab-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 0.95em; }
+    .vocab-table th, .vocab-table td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; vertical-align: top; }
+    .vocab-table th { background-color: #f8f9fa; color: var(--primary); font-weight: bold; position: sticky; top: 0; border-top: 2px solid #28a745; }
+    .vocab-table tr:hover { background-color: #f1f8e9; }
+    .close-reading-btn { width: 100%; padding: 10px; background: #eee; border: none; cursor: pointer; color: #555; border-radius: 0 0 8px 8px; font-weight: bold; }
+    .close-reading-btn:hover { background: #e0e0e0; }
 
     /* 測驗區 */
     #quiz-screen { display: none; }
@@ -78,6 +101,7 @@
 
     @media (max-width: 700px) { .options-grid { grid-template-columns: 1fr; } .vocab-list { grid-template-columns: 1fr; } .header { padding: 15px; } }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideDown { from { opacity: 0; max-height: 0; } to { opacity: 1; max-height: 2000px; } }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 </style>
 </head>
@@ -106,16 +130,37 @@
             <span class="status-badge status-sync">已連線</span>
             <span class="logout-link" onclick="logout()">[登出]</span>
         </div>
-        <p class="subtitle">請選擇測驗主題</p>
+
+        <p class="subtitle" style="font-weight:bold; color:var(--primary);">🎯 請選擇測驗主題</p>
         <div class="btn-grid">
             <button class="menu-btn" onclick="startQuiz('deepseek', false)">
-                <h3>📈 來源一：DeepSeek</h3>
-                <p>AI 趨勢、投資術語 (110 題)</p>
+                <h3>📈 測驗：DeepSeek & AI</h3>
+                <p>AI 市場趨勢、投資術語 (110 題)</p>
             </button>
             <button class="menu-btn" onclick="startQuiz('robots', false)">
-                <h3>🤖 來源二：Robots</h3>
+                <h3>🤖 測驗：Robotics</h3>
                 <p>機器人技術、自動化 (95 題)</p>
             </button>
+        </div>
+
+        <div class="section-divider">
+            <span class="section-label">📖 考前閱讀與複習</span>
+        </div>
+
+        <div class="btn-grid">
+            <button id="read-deepseek-btn" class="read-btn" onclick="toggleReading('deepseek')">
+                <h3>📖 DeepSeek 單字表</h3>
+                <p>點擊展開 / 摺疊閱讀清單</p>
+            </button>
+            <button id="read-robots-btn" class="read-btn" onclick="toggleReading('robots')">
+                <h3>📖 Robots 單字表</h3>
+                <p>點擊展開 / 摺疊閱讀清單</p>
+            </button>
+        </div>
+
+        <div id="reading-display-area">
+            <div id="reading-table-container"></div>
+            <button class="close-reading-btn" onclick="closeReading()">▲ 收起閱讀列表</button>
         </div>
     </div>
 
@@ -172,255 +217,287 @@
 // ============================================
 // 設定區 (請填入你的 URL)
 // ============================================
-// ⚠️ 貼上你的 Google Apps Script 網址在下方引號內
-const API_URL = "https://script.google.com/macros/s/AKfycbwSc3A0RoFNNxq41PbdkSh1gFEbJ5F1bCiaHPktmedZ7Dy0vIhJkj12zZ2DFDGGM3OqhQ/exec"; 
+const API_URL = "REPLACE_WITH_API_URL"; 
 
 // ============================================
-// 資料庫 (內容略，為節省篇幅使用省略號，請保留原本的完整 database 內容)
+// 資料庫 (完整題庫)
 // ============================================
 const database = {
     deepseek: [
         {w: "Artificial Intelligence", z: "人工智慧", s: "[_____] helps businesses automate customer service through chatbots.", st: "<span class='hl'>人工智慧</span> 幫助企業透過聊天機器人自動化客戶服務。"},
-        // ... (請將之前 110 題完整內容保留於此) ...
-        {w: "Mover", z: "推動者", s: "DeepSeek is a key [_____] in the AI space, pushing new innovations.", st: "DeepSeek 是 AI 領域的關鍵 <span class='hl'>推動者</span>，推動新創新。"}
+        {w: "To make waves", z: "引起轟動", s: "The new AI company is [_____] with its groundbreaking technology.", st: "這家新 AI 公司憑藉其突破性技術在業界 <span class='hl'>引起轟動</span>。"},
+        {w: "DeepSeek", z: "DeepSeek (公司名)", s: "[_____] has introduced a powerful AI model that challenges industry leaders.", st: "<span class='hl'>DeepSeek</span> 推出了一款強大的 AI 模型，挑戰行業領導者。"},
+        {w: "Lab", z: "實驗室", s: "The AI [_____] is working on new algorithms to improve machine learning.", st: "該 AI <span class='hl'>實驗室</span> 正在研究新算法以改進機器學習。"},
+        {w: "To upend expectations", z: "顛覆預期", s: "DeepSeek’s new AI model has [_____] in the tech world.", st: "DeepSeek 的新 AI 模型 <span class='hl'>顛覆了預期</span>。"},
+        {w: "To draw attention", z: "吸引注意", s: "The startup [_____] after announcing a major breakthrough in AI.", st: "這家新創公司在宣布 AI 的重大突破後 <span class='hl'>吸引了注意</span>。"},
+        {w: "Player", z: "參與者/業者", s: "DeepSeek has quickly become a key [_____] in the AI field.", st: "DeepSeek 迅速成為 AI 領域的關鍵 <span class='hl'>參與者</span>。"},
+        {w: "Field", z: "領域", s: "AI is a rapidly growing [_____] with many new opportunities.", st: "AI 是一個充滿許多新機遇且迅速發展的 <span class='hl'>領域</span>。"},
+        {w: "Giant", z: "巨頭", s: "Tech [_____]s like Google and Microsoft are competing in AI development.", st: "像 Google 和微軟這樣的科技 <span class='hl'>巨頭</span> 正在 AI 研發上競爭。"},
+        {w: "To redefine", z: "重新定義", s: "DeepSeek aims [_____] how AI models process information.", st: "DeepSeek 旨在 <span class='hl'>重新定義</span> AI 模型處理資訊的方式。"},
+        {w: "To kick off", z: "開始/啟動", s: "The company [_____]ed its AI research with a new lab in Shanghai.", st: "該公司在上海成立新實驗室，<span class='hl'>啟動</span> 了其 AI 研究。"},
+        {w: "To stun", z: "使大吃一驚", s: "The accuracy of the AI model [_____]ned experts in the industry.", st: "該 AI 模型的準確性令業內專家 <span class='hl'>大吃一驚</span>。"},
+        {w: "To reveal", z: "揭露", s: "The company [_____]ed its latest AI project at the tech conference.", st: "該公司在科技大會上 <span class='hl'>揭露</span> 了其最新的 AI 項目。"},
+        {w: "Technical recipe", z: "技術配方", s: "The researchers shared the [_____] for training AI models efficiently.", st: "研究人員分享了高效訓練 AI 模型的 <span class='hl'>技術配方</span>。"},
+        {w: "Cutting-edge", z: "尖端的", s: "DeepSeek’s [_____] AI technology is attracting major investors.", st: "DeepSeek <span class='hl'>尖端的</span> AI 技術吸引了主要投資者。"},
+        {w: "AI model", z: "AI 模型", s: "This [_____] can generate human-like text with high accuracy.", st: "這個 <span class='hl'>AI 模型</span> 可以高精確度地生成類似人類的文字。"},
+        {w: "To transform", z: "轉型/轉變", s: "AI has [_____]ed the way businesses analyze data and make decisions.", st: "AI <span class='hl'>改變</span> 了企業分析數據和做決策的方式。"},
+        {w: "Reclusive", z: "隱居的/低調的", s: "The [_____] AI researcher rarely gives interviews.", st: "這位 <span class='hl'>低調的</span> AI 研究員很少接受採訪。"},
+        {w: "To defy", z: "違抗/挑战", s: "DeepSeek’s latest project [_____]ies traditional AI development methods.", st: "DeepSeek 的最新項目 <span class='hl'>挑戰</span> 了傳統的 AI 開發方法。"},
+        {w: "Ambitions", z: "雄心/野心", s: "The company’s [_____] include becoming a leader in AI research.", st: "該公司的 <span class='hl'>雄心</span> 包括成為 AI 研究的領導者。"},
+        {w: "Founded", z: "創立", s: "DeepSeek was [_____] by a group of AI researchers in China.", st: "DeepSeek 是由中國的一群 AI 研究人員 <span class='hl'>創立</span> 的。"},
+        {w: "Hedge fund", z: "對沖基金", s: "The [_____] invested millions in AI startups.", st: "該 <span class='hl'>對沖基金</span> 向 AI 新創公司投資了數百萬美元。"},
+        {w: "Paper", z: "論文", s: "Their [_____] on AI ethics was widely discussed in the tech community.", st: "他們關於 AI 倫理的 <span class='hl'>論文</span> 在科技界引起了廣泛討論。"},
+        {w: "Large language model", z: "大型語言模型", s: "GPT-4 is a well-known [_____] used for various applications.", st: "GPT-4 是一個著名的、用於各種應用的 <span class='hl'>大型語言模型</span>。"},
+        {w: "Bootstrapped", z: "白手起家", s: "The startup was [_____] for years before receiving funding.", st: "這家新創公司在獲得融資前，多年來一直靠 <span class='hl'>自籌資金</span> 運作。"},
+        {w: "Landscape", z: "景觀/形勢", s: "The AI [_____] is constantly changing with new advancements.", st: "AI 行業的 <span class='hl'>形勢</span> 隨著新的進展而不斷變化。"},
+        {w: "To dominate", z: "主導/統治", s: "Big tech companies [_____] the AI sector with their advanced models.", st: "大科技公司憑藉其先進的模型 <span class='hl'>主導</span> 了 AI 領域。"},
+        {w: "Deep pockets", z: "財力雄厚", s: "Companies with [_____] can afford to invest heavily in AI research.", st: "<span class='hl'>財力雄厚</span> 的公司負擔得起對 AI 研究的大量投資。"},
+        {w: "Vast", z: "海量的/巨大的", s: "The AI model was trained on a [_____] amount of data from the internet.", st: "該 AI 模型是在來自網路的 <span class='hl'>海量</span> 數據上進行訓練的。"},
+        {w: "Breakthrough", z: "突破", s: "The development of DeepSeek’s AI model was a [_____] in natural language processing.", st: "DeepSeek AI 模型的開發是自然語言處理領域的一個 <span class='hl'>突破</span>。"},
+        {w: "Innovation", z: "創新", s: "AI-driven automation is one of the biggest [_____]s in the business world.", st: "AI 驅動的自動化是商業世界最大的 <span class='hl'>創新</span> 之一。"},
+        {w: "To gain traction", z: "獲得青睞", s: "DeepSeek’s AI model is [_____] among developers and businesses.", st: "DeepSeek 的 AI 模型正受到開發者和企業的 <span class='hl'>青睞</span>。"},
+        {w: "To shift", z: "轉移", s: "The company [_____]ed its focus from traditional AI to large language models.", st: "該公司將重心從傳統 AI <span class='hl'>轉移</span> 到了大型語言模型。"},
+        {w: "Accessible", z: "易於取得的", s: "The new AI platform is [_____] to businesses of all sizes.", st: "新的 AI 平台 <span class='hl'>可供</span> 各種規模的企業使用。"},
+        {w: "To rethink", z: "重新思考", s: "Companies are [_____]ing their strategies because of AI advancements.", st: "由於 AI 的進步，各公司正在 <span class='hl'>重新思考</span> 其戰略。"},
+        {w: "Exorbitant", z: "過高的", s: "Training large AI models requires an [_____] amount of computing power.", st: "訓練大型 AI 模型需要 <span class='hl'>極高昂</span> 的運算能力。"},
+        {w: "Reasoning", z: "推理", s: "The AI model has strong [_____] skills and can analyze complex problems.", st: "該 AI 模型具有強大的 <span class='hl'>推理</span> 能力，可以分析複雜的問題。"},
+        {w: "Opening", z: "契機/空隙", s: "DeepSeek’s success created an [_____] for smaller AI startups to compete.", st: "DeepSeek 的成功為較小的 AI 新創公司創造了競爭 <span class='hl'>契機</span>。"},
+        {w: "Outside investment", z: "外部投資", s: "The company secured [_____] to expand its AI research.", st: "該公司獲得了 <span class='hl'>外部投資</span> 以擴大其 AI 研究。"},
+        {w: "Paradigm shift", z: "典範轉移", s: "AI is causing a [_____] in how businesses operate.", st: "AI 正在引發企業運作方式的 <span class='hl'>典範轉移</span>。"},
+        {w: "Democratized", z: "民主化", s: "Open-source AI tools have [_____] access to advanced technology.", st: "開源 AI 工具讓先進技術的使用變得 <span class='hl'>民主化</span>。"},
+        {w: "To host", z: "託管", s: "The company [_____]s its AI model on a cloud server to ensure fast and reliable access.", st: "該公司將其 AI 模型 <span class='hl'>託管</span> 在雲端伺服器上，以確保快速可靠的訪問。"},
+        {w: "In isolation", z: "孤立地", s: "The data must be analyzed [_____] to understand its impact.", st: "數據必須被 <span class='hl'>孤立地</span> 分析以理解其影響。"},
+        {w: "Interests", z: "利益", s: "Tech companies have strong [_____] in AI development.", st: "科技公司在 AI 研發中擁有強大的 <span class='hl'>利益</span>。"},
+        {w: "Origins", z: "起源", s: "The [_____] of DeepSeek’s AI research can be traced back to university labs.", st: "DeepSeek AI 研究的 <span class='hl'>起源</span> 可以追溯到大學實驗室。"},
+        {w: "Powerhouse", z: "強大機構", s: "DeepSeek is becoming a [_____] in the AI industry.", st: "DeepSeek 正在成為 AI 行業的 <span class='hl'>強大勢力</span>。"},
+        {w: "To shed light on", z: "闡明/解釋", s: "The report [_____]s the risks of AI automation in finance.", st: "該報告 <span class='hl'>闡明</span> 了金融領域 AI 自動化的風險。"},
+        {w: "Controlling shareholder", z: "控股股東", s: "The [_____] approved the company’s expansion into AI.", st: "<span class='hl'>控股股東</span> 批准了公司向 AI 領域的擴張。"},
+        {w: "To co-found", z: "共同創立", s: "He [_____]ed an AI startup focused on deep learning research.", st: "他 <span class='hl'>共同創辦</span> 了一家專注於深度學習研究的 AI 新創公司。"},
+        {w: "Quantitative hedge fund", z: "量化對沖基金", s: "The [_____] relies on AI to analyze market trends.", st: "該 <span class='hl'>量化對沖基金</span> 依賴 AI 來分析市場趨勢。"},
+        {w: "Driven", z: "驅動的", s: "The company is [_____] by a vision to make AI more accessible.", st: "該公司受使 AI 更易於取得的願景所 <span class='hl'>驅動</span>。"},
+        {w: "Trading strategies", z: "交易策略", s: "AI is now used to develop more advanced [_____].", st: "AI 現在被用於開發更先進的 <span class='hl'>交易策略</span>。"},
+        {w: "Arm", z: "部門", s: "The company’s AI research [_____] is working on a new language model.", st: "該公司的 AI 研究 <span class='hl'>部門</span> 正在開發一種新的語言模型。"},
+        {w: "To explore", z: "探索", s: "They are [_____]ing ways to integrate AI into healthcare.", st: "他們正在 <span class='hl'>探索</span> 將 AI 整合到醫療保健中的方法。"},
+        {w: "Artificial General Intelligence", z: "通用人工智慧", s: "Many researchers believe [_____] is still decades away.", st: "許多研究人員認為 <span class='hl'>通用人工智慧</span> 距離實現仍有幾十年的時間。"},
+        {w: "Global scene", z: "全球舞台", s: "DeepSeek is making a name for itself on the [_____].", st: "DeepSeek 正在 <span class='hl'>全球 AI 舞台</span> 上聲名大噪。"},
+        {w: "Hype", z: "炒作", s: "The [_____] around AI-powered chatbots has led to increased investment.", st: "圍繞 AI 聊天機器人的 <span class='hl'>炒作</span> 導致了投資增加。"},
+        {w: "Bullishness", z: "看漲/樂觀", s: "Investors' [_____] on AI stocks has driven market growth.", st: "投資者對 AI 股票的 <span class='hl'>看漲</span> 情緒推動了市場增長。"},
+        {w: "To inspire", z: "啟發", s: "DeepSeek’s breakthrough has [_____]d new AI startups.", st: "DeepSeek 的突破 <span class='hl'>啟發</span> 了新的 AI 新創公司。"},
+        {w: "Frenzy", z: "狂熱", s: "The AI investment [_____] has led to skyrocketing stock prices.", st: "AI 投資 <span class='hl'>狂熱</span> 導致股價飛漲。"},
+        {w: "Chipmaker", z: "晶片製造商", s: "Major [_____]s are racing to develop faster processors for AI.", st: "主要 <span class='hl'>晶片製造商</span> 正競相開發更快的 AI 處理器。"},
+        {w: "Blind spot", z: "盲點", s: "Many companies have a [_____] when it comes to AI ethics.", st: "許多公司在 AI 倫理方面存在 <span class='hl'>盲點</span>。"},
+        {w: "To turn upside down", z: "徹底改變", s: "AI has [_____] the job market [_____] by automating many roles.", st: "AI 透過自動化許多職位，<span class='hl'>徹底改變</span> 了就業市場。"},
+        {w: "Wall Street", z: "華爾街", s: "[_____] is closely watching the rise of AI-driven businesses.", st: "<span class='hl'>華爾街</span> 正密切關注 AI 驅動企業的崛起。"},
+        {w: "To drop", z: "下跌", s: "AI stocks [_____]ped sharply after the company’s disappointing earnings report.", st: "在公司令人失望的財報發布後，AI 股票大幅 <span class='hl'>下跌</span>。"},
+        {w: "S&P 500", z: "標普500", s: "AI companies now make up a significant portion of the [_____].", st: "AI 公司現在佔據了 <span class='hl'>標普 500 指數</span> 的很大一部分。"},
+        {w: "Sector", z: "部門/板塊", s: "The tech [_____] has seen massive investment in AI development.", st: "科技 <span class='hl'>板塊</span> 在 AI 研發方面見證了海量投資。"},
+        {w: "Decline", z: "下降/衰退", s: "The [_____] in semiconductor sales affected AI research funding.", st: "半導體銷售的 <span class='hl'>下降</span> 影響了 AI 研究資金。"},
+        {w: "Bloodbath", z: "大放血/慘敗", s: "The stock market [_____] wiped out billions in AI funding.", st: "股市 <span class='hl'>大放血</span> 抹去了數十億美元的 AI 資金。"},
+        {w: "To wipe out", z: "抹去/摧毀", s: "The market crash [_____]d years of AI investment gains.", st: "市場崩盤 <span class='hl'>抹去</span> 了多年的 AI 投資收益。"},
+        {w: "Stock picker", z: "選股者", s: "[_____]s are betting on AI companies for high returns.", st: "<span class='hl'>選股者</span> 正押注 AI 公司以獲得高回報。"},
+        {w: "Euphoria", z: "興奮感", s: "The early success of AI startups created a sense of [_____] among investors.", st: "AI 新創公司的早期成功在投資者中營造了一種 <span class='hl'>興奮感</span>。"},
+        {w: "To reach heights", z: "達到高度", s: "The AI industry has [_____] new [_____] with recent breakthroughs.", st: "AI 行業憑藉最近的突破 <span class='hl'>達到了新高度</span>。"},
+        {w: "Unsustainable", z: "不可持續的", s: "The rapid growth of AI investments may be [_____] in the long term.", st: "AI 投資的快速增長長期來看可能是 <span class='hl'>不可持續的</span>。"},
+        {w: "Shake-up", z: "大洗牌", s: "The rise of AI has led to a [_____] in the job market.", st: "AI 的崛起導致了就業市場的 <span class='hl'>大洗牌</span>。"},
+        {w: "To fuel", z: "推動/加劇", s: "AI research is [_____]ing competition between major tech firms.", st: "AI 研究正 <span class='hl'>推動</span> 大型科技公司之間的競爭。"},
+        {w: "Arms race", z: "軍備競賽", s: "The AI [_____] has led to massive investment in machine learning.", st: "AI <span class='hl'>軍備競賽</span> 導致了對機器學習的海量投資。"},
+        {w: "To scale back", z: "縮減", s: "The company had [_____] its AI projects due to funding cuts.", st: "由於資金削減，該公司不得不 <span class='hl'>縮減</span> 其 AI 項目。"},
+        {w: "To double down", z: "加倍努力", s: "Despite setbacks, the company is [_____]ing on AI research.", st: "儘管遭遇挫折，該公司仍 <span class='hl'>加倍投入</span> AI 研究。"},
+        {w: "To pour", z: "傾注", s: "Investors are [_____]ing billions into AI startups.", st: "投資者正向 AI 新創公司 <span class='hl'>傾注</span> 數十億美元。"},
+        {w: "Aggressive", z: "進取的", s: "The company’s [_____] expansion into AI is reshaping the industry.", st: "該公司對 AI 的 <span class='hl'>進取</span> 擴張正在重塑行業。"},
+        {w: "To stay ahead", z: "保持領先", s: "Tech giants are constantly innovating to stay ahead in AI development.", st: "科技巨頭不斷創新以在 AI 發展中 <span class='hl'>保持領先</span>。"},
+        {w: "Unpredictable", z: "不可預測的", s: "The impact of AI on jobs remains [_____].", st: "AI 對就業的影響仍然 <span class='hl'>不可預測</span>。"},
+        {w: "Big Tech", z: "大科技公司", s: "[_____] is leading the way in AI advancements.", st: "<span class='hl'>大科技公司</span> 在 AI 進步方面正處於領先地位。"},
+        {w: "Unchecked", z: "不受限制的", s: "There are concerns about the [_____] growth of AI in sensitive areas like surveillance.", st: "人們擔心 AI 在監控等敏感領域 <span class='hl'>不受限制</span> 地發展。"},
+        {w: "To top", z: "超過", s: "The new AI startup [_____]ped its funding goal in just a few days.", st: "這家新的 AI 新創公司在短短幾天內就 <span class='hl'>超過</span> 了其融資目標。"},
+        {w: "Rival", z: "對手", s: "DeepSeek is becoming a strong [_____] to established AI companies.", st: "DeepSeek 正成為老牌 AI 公司的強勁 <span class='hl'>對手</span>。"},
+        {w: "Infrastructure", z: "基礎設施", s: "AI models require powerful cloud infrastructure to function efficiently.", st: "AI 模型需要強大的雲端 <span class='hl'>基礎設施</span> 才能高效運作。"},
+        {w: "To surge", z: "飆升", s: "Investment in AI startups has [_____]d in the past year.", st: "對 AI 新創公司的投資在過去一年中 <span class='hl'>飆升</span>。"},
+        {w: "Historic levels", z: "歷史水平", s: "AI stock prices have reached [_____] due to growing demand.", st: "由於需求增長，AI 股價已達到 <span class='hl'>歷史水平</span>。"},
+        {w: "To vow", z: "誓言", s: "The company [_____]ed to develop AI responsibly and ethically.", st: "該公司 <span class='hl'>誓言</span> 將負責任且符合倫理地開發 AI。"},
+        {w: "To accelerate", z: "加速", s: "The new AI chips will accelerate machine learning development.", st: "新的 AI 晶片將 <span class='hl'>加速</span> 機器學習的發展。"},
+        {w: "To dismiss", z: "駁回/不理會", s: "The CEO [_____]ed concerns about AI replacing human jobs.", st: "執行長 <span class='hl'>不理會</span> 關於 AI 取代人類工作的擔憂。"},
+        {w: "To bet on", z: "押注於", s: "Investors are betting on AI to drive the future of technology.", st: "投資者正 <span class='hl'>押注於</span> AI 來驅動科技的未來。"},
+        {w: "Nascent", z: "初期的", s: "The [_____] AI industry is evolving rapidly with new breakthroughs.", st: "<span class='hl'>初期的</span> AI 行業隨著新的突破正迅速演變。"},
+        {w: "To loom large", z: "凸顯/威脅逼近", s: "Concerns about AI regulation [_____] among tech leaders.", st: "對 AI 監管的擔憂在科技領袖中 <span class='hl'>愈顯突出</span>。"},
+        {w: "To dictate", z: "支配/主宰", s: "Market trends [_____] how companies invest in AI technology.", st: "市場趨勢 <span class='hl'>支配</span> 著公司如何投資 AI 技術。"},
+        {w: "Dominant", z: "佔主導地位的", s: "A few [_____] companies control much of the AI research space.", st: "少數幾家 <span class='hl'>佔主導地位的</span> 公司控制了大部分 AI 研究空間。"},
+        {w: "Challengers", z: "挑戰者", s: "New AI startups are emerging as [_____] to Big Tech.", st: "新的 AI 新創公司正作為大科技公司的 <span class='hl'>挑戰者</span> 出現。"},
+        {w: "To reshape", z: "重塑", s: "AI is [_____]ing industries from healthcare to finance.", st: "AI 正在 <span class='hl'>重塑</span> 從醫療到金融的各個行業。"},
+        {w: "Business model", z: "商業模式", s: "AI is forcing companies to rethink their [_____]s.", st: "AI 正迫使公司重新思考其 <span class='hl'>商業模式</span>。"},
+        {w: "To emerge", z: "脫穎而出", s: "China has [_____]d as a major player in AI research.", st: "中國已 <span class='hl'>脫穎而出</span>，成為 AI 研究的主要參與者。"},
+        {w: "Phase", z: "階段", s: "The AI project is entering its final testing [_____].", st: "該 AI 項目正進入最終測試 <span class='hl'>階段</span>。"},
+        {w: "Researcher", z: "研究員", s: "AI [_____]s are working to improve machine learning algorithms.", st: "AI <span class='hl'>研究員</span> 正致力於改進機器學習算法。"},
+        {w: "Release", z: "發布", s: "The company announced the [_____] of its latest AI model.", st: "該公司宣布 <span class='hl'>發布</span> 其最新的 AI 模型。"},
+        {w: "Moat", z: "護城河", s: "DeepSeek’s access to massive datasets gives it a strong [_____].", st: "DeepSeek 對海量數據集的獲取賦予了它強大的 <span class='hl'>護城河</span>。"},
+        {w: "To train a model", z: "訓練模型", s: "The team [_____]ed the AI model using millions of text documents.", st: "團隊使用數百萬份文本文件 <span class='hl'>訓練</span> 了該 AI 模型。"},
+        {w: "To expend", z: "消耗", s: "Training large AI models [_____]s massive computing power.", st: "訓練大型 AI 模型 <span class='hl'>消耗</span> 了海量的運算能力。"},
+        {w: "Mover", z: "動力源/推動者", s: "DeepSeek is a key [_____] in the AI space, pushing new innovations.", st: "DeepSeek 是 AI 領域的關鍵 <span class='hl'>推動者</span>，推動著新的創新。"}
     ],
     robots: [
-        {w: "Generative AI", z: "生成式 AI", s: "[_____] can write stories and create images.", st: "<span class='hl'>生成式 AI</span> 可以撰寫故事並創作圖像。"},
-        // ... (請將之前 95 題完整內容保留於此) ...
-        {w: "Game-changing", z: "顛覆性的", s: "This new technology is [_____] for the industry.", st: "這項新技術對產業來說是 <span class='hl'>顛覆性的</span>。"}
+        {w: "Generative AI", z: "生成式 AI", s: "[_____] can write stories and create images.", st: "<span class='hl'>生成式 AI</span> 可以寫故事和創作圖像。"},
+        {w: "To grab headlines", z: "吸引媒體關注", s: "The new technology [_____] around the world.", st: "這項新技術 <span class='hl'>吸引了全球媒體的關注</span>。"},
+        {w: "Robotics", z: "機器人技術", s: "[_____] is used to build machines that can do work for humans.", st: "<span class='hl'>機器人技術</span> 被用於製造可以為人類工作的機器。"},
+        {w: "Rapid clip", z: "飛速", s: "Technology is advancing at a [_____] these days.", st: "科技現今正以 <span class='hl'>飛速</span> 進步。"},
+        {w: "Robot", z: "機器人", s: "The factory uses [_____]s to assemble cars.", st: "工廠使用 <span class='hl'>機器人</span> 來組裝汽車。"},
+        {w: "Spotlight", z: "焦點", s: "The new product was in the [_____] at the tech show.", st: "新產品在科技展上成為 <span class='hl'>焦點</span>。"},
+        {w: "Mass media", z: "大眾媒體", s: "The [_____] reported on the new invention.", st: "<span class='hl'>大眾媒體</span> 報導了這項新發明。"},
+        {w: "To boom", z: "蓬勃發展", s: "The tech industry continues to [_____].", st: "科技產業繼續 <span class='hl'>蓬勃發展</span>。"},
+        {w: "Stock", z: "庫存", s: "The store has a large [_____] of electronics.", st: "這家商店有大量的電子產品 <span class='hl'>庫存</span>。"},
+        {w: "Operational", z: "運作中的", s: "The new system will be [_____] next month.", st: "新系統將於下個月 <span class='hl'>投入運作</span>。"},
+        {w: "Unit", z: "單位/台", s: "Each [_____] is tested before leaving the factory.", st: "每 <span class='hl'>台</span> 機器在離開工廠前都經過測試。"},
+        {w: "Value", z: "價值", s: "The [_____] of the software lies in its simplicity.", st: "該軟體的 <span class='hl'>價值</span> 在於其簡潔性。"},
+        {w: "Installation", z: "安裝", s: "The [_____] of the new machines took two days.", st: "新機器的 <span class='hl'>安裝</span> 花費了兩天。"},
+        {w: "Estimated", z: "估計的", s: "The project will be completed in an [_____] six months.", st: "該項目預計將在 <span class='hl'>估計</span> 六個月內完成。"},
+        {w: "To play a role", z: "發揮作用", s: "Technology [_____]s a big role in our daily lives.", st: "科技在我們的日常生活中 <span class='hl'>發揮著重大作用</span>。"},
+        {w: "Fundamental", z: "基礎的", s: "Trust is [_____] to any relationship.", st: "信任是任何關係的 <span class='hl'>基礎</span>。"},
+        {w: "Demands", z: "需求", s: "The job has high [_____], but it's rewarding.", st: "這份工作 <span class='hl'>要求</span> 很高，但很有成就感。"},
+        {w: "To call to mind", z: "讓人想起", s: "The smell of cookies [_____]s my grandmother's kitchen.", st: "餅乾的味道 <span class='hl'>讓人想起</span> 我祖母的廚房。"},
+        {w: "Automotive", z: "汽車的", s: "The [_____] industry is investing in electric cars.", st: "<span class='hl'>汽車</span> 行業正在投資電動汽車。"},
+        {w: "Early adopter", z: "早期採用者", s: "As an [_____], he always has the latest gadgets.", st: "作為 <span class='hl'>早期採用者</span>，他總是有最新的小裝置。"},
+        {w: "To deploy", z: "部署", s: "The company will [_____] new software next week.", st: "公司下週將 <span class='hl'>部署</span> 新軟體。"},
+        {w: "Scale", z: "規模", s: "We need to increase the [_____] of our operations.", st: "我們需要擴大營運 <span class='hl'>規模</span>。"},
+        {w: "Assembly-line", z: "組裝線", s: "Cars are built on an [_____] to speed up production.", st: "汽車在 <span class='hl'>組裝線</span> 上建造以加快生產速度。"},
+        {w: "Application", z: "應用", s: "This app has many practical [_____]s.", st: "這款應用程式有許多實際 <span class='hl'>用途</span>。"},
+        {w: "SME", z: "中小企業", s: "[_____]s play a crucial role in the economy.", st: "<span class='hl'>中小企業</span> 在經濟中發揮著關鍵作用。"},
+        {w: "Collaborative", z: "協作的", s: "We use [_____] tools to improve teamwork.", st: "我們使用 <span class='hl'>協作</span> 工具來改善團隊合作。"},
+        {w: "Cobot", z: "協作機器人", s: "[_____]s help workers in factories by handling repetitive tasks.", st: "<span class='hl'>協作機器人</span> 透過處理重複性任務幫助工廠工人。"},
+        {w: "Customizable", z: "可定制的", s: "The software is [_____] to fit each user's preferences.", st: "該軟體 <span class='hl'>可定制</span> 以符合每位使用者的偏好。"},
+        {w: "Automation", z: "自動化", s: "[_____] in factories speeds up production.", st: "工廠的 <span class='hl'>自動化</span> 加快了生產速度。"},
+        {w: "Tempting", z: "誘人的", s: "The offer is [_____], but I need to think about it.", st: "這個提議很 <span class='hl'>誘人</span>，但我需要考慮一下。"},
+        {w: "Startup", z: "新創公司", s: "He invested in a tech [_____] that's developing innovative apps.", st: "他投資了一家正在開發創新應用的科技 <span class='hl'>新創公司</span>。"},
+        {w: "Traditional", z: "傳統的", s: "[_____] cooking methods are still popular today.", st: "<span class='hl'>傳統的</span> 烹飪方法在今天仍然很受歡迎。"},
+        {w: "Affordability", z: "負擔能力", s: "The [_____] of the product makes it accessible to more people.", st: "產品的 <span class='hl'>可負擔性</span> 使更多人能夠購買。"},
+        {w: "Versatility", z: "多功能性", s: "The tool's [_____] makes it useful for various tasks.", st: "該工具的 <span class='hl'>多功能性</span> 使其適用於各種任務。"},
+        {w: "To implement", z: "執行", s: "The company plans to [_____] new policies next year.", st: "公司計劃明年 <span class='hl'>實施</span> 新政策。"},
+        {w: "To scale", z: "擴大規模", s: "We need to [_____] our production to meet demand.", st: "我們需要 <span class='hl'>擴大</span> 生產規模以滿足需求。"},
+        {w: "To enhance", z: "增強", s: "We added features to [_____] the user experience.", st: "我們增加了功能以 <span class='hl'>提升</span> 使用者體驗。"},
+        {w: "Quality control", z: "品質控制", s: "[_____] is essential in manufacturing.", st: "<span class='hl'>品質控制</span> 在製造業中至關重要。"},
+        {w: "Perspective", z: "觀點", s: "From her [_____], the solution was simple.", st: "從她的 <span class='hl'>觀點</span> 來看，解決方案很簡單。"},
+        {w: "Flesh and blood", z: "血肉之軀", s: "It's hard to believe the robot isn't [_____].", st: "很難相信這個機器人不是 <span class='hl'>血肉之軀</span>。"},
+        {w: "Repetitive", z: "重複性的", s: "The job is [_____], but it pays well.", st: "這份工作是 <span class='hl'>重複性的</span>，但報酬很高。"},
+        {w: "Soul-destroying", z: "枯燥乏味的", s: "Filling out endless forms is [_____].", st: "填寫沒完沒了的表格是非常 <span class='hl'>枯燥乏味的</span>。"},
+        {w: "Prone to error", z: "易出錯的", s: "Human workers are more [_____] than machines.", st: "人類工人比機器更 <span class='hl'>容易出錯</span>。"},
+        {w: "To prompt", z: "促使", s: "The announcement [_____]ed a lot of questions.", st: "該公告 <span class='hl'>引起</span> 了許多問題。"},
+        {w: "To embrace", z: "擁抱", s: "They decided to [_____] new technologies in their work.", st: "他們決定在工作中 <span class='hl'>擁抱</span> 新技術。"},
+        {w: "Emerging", z: "新興的", s: "[_____] markets offer new opportunities for investors.", st: "<span class='hl'>新興</span> 市場為投資者提供了新機會。"},
+        {w: "Routine", z: "常規", s: "Having a morning [_____] helps me stay organized.", st: "擁有早晨的 <span class='hl'>常規</span> 流程幫助我保持井然有序。"},
+        {w: "Bot", z: "機器人程式", s: "Chat[_____]s help answer customer queries online.", st: "聊天 <span class='hl'>機器人</span> 幫助在線回答客戶諮詢。"},
+        {w: "Use case", z: "使用案例", s: "This software has many [_____]s in different industries.", st: "這款軟體在不同行業有許多 <span class='hl'>使用案例</span>。"},
+        {w: "To range", z: "範圍", s: "Prices [_____] from $10 to $50 depending on the model.", st: "價格從 10 美元到 50 美元 <span class='hl'>不等</span>，取決於型號。"},
+        {w: "Enterprise", z: "企業", s: "The [_____] expanded its operations globally.", st: "該 <span class='hl'>企業</span> 在全球擴張了其業務。"},
+        {w: "To trigger", z: "觸發", s: "The alarm was [_____]ed by a security breach.", st: "警報是由安全漏洞 <span class='hl'>觸發</span> 的。"},
+        {w: "To manipulate", z: "操縱", s: "He knows how to [_____] the data to get the results he wants.", st: "他知道如何 <span class='hl'>處理</span> 數據以獲得他想要的結果。"},
+        {w: "Ubiquitous", z: "無所不在的", s: "Smartphones have become [_____] in modern life.", st: "智慧型手機在現代生活中已 <span class='hl'>無所不在</span>。"},
+        {w: "Embedded", z: "嵌入的", s: "The sensors are [_____] in the factory floor.", st: "感測器 <span class='hl'>嵌入</span> 在工廠地板中。"},
+        {w: "Factory floor", z: "工廠車間", s: "Workers on the [_____] are using new machines.", st: "<span class='hl'>工廠車間</span> 的工人正在使用新機器。"},
+        {w: "Boon", z: "恩惠", s: "The new software is a [_____] to our productivity.", st: "新軟體對我們的生產力是一大 <span class='hl'>助益</span>。"},
+        {w: "Recruitment", z: "招聘", s: "The company is focusing on [_____] to fill open positions.", st: "公司正專注於 <span class='hl'>招聘</span> 以填補空缺職位。"},
+        {w: "Retention", z: "留任", s: "Improving work conditions helps with employee [_____].", st: "改善工作條件有助於 <span class='hl'>留住</span> 員工。"},
+        {w: "Prominent", z: "傑出的", s: "She is a [_____] figure in the tech industry.", st: "她是科技界的 <span class='hl'>傑出</span> 人物。"},
+        {w: "Case in point", z: "典型案例", s: "He is always late, [_____], he missed today's meeting.", st: "他總是遲到，<span class='hl'>典型案例</span> 就是他錯過了今天的會議。"},
+        {w: "To hold promise", z: "大有希望", s: "The new technology [_____]s for many applications.", st: "這項新技術在許多應用上 <span class='hl'>大有希望</span>。"},
+        {w: "To perform", z: "執行", s: "The robot can [_____] various tasks with precision.", st: "機器人可以精確地 <span class='hl'>執行</span> 各種任務。"},
+        {w: "Patient", z: "病人", s: "The doctor was very kind to the [_____].", st: "醫生對 <span class='hl'>病人</span> 非常親切。"},
+        {w: "Initial", z: "最初的", s: "We had an [_____] meeting to discuss the project.", st: "我們開了 <span class='hl'>初次</span> 會議來討論該項目。"},
+        {w: "Trial", z: "試驗", s: "The new drug is currently in [_____]s.", st: "新藥目前正在 <span class='hl'>試驗</span> 中。"},
+        {w: "To facilitate", z: "促進", s: "These tools [_____] remote work.", st: "這些工具使遠端辦公變得更 <span class='hl'>便利</span>。"},
+        {w: "Advances", z: "進展", s: "Recent [_____] in technology have improved our lives.", st: "最近的科技 <span class='hl'>進步</span> 改善了我們的生活。"},
+        {w: "Large language model", z: "大型語言模型", s: "ChatGPT is an example of a [_____].", st: "ChatGPT 是 <span class='hl'>大型語言模型</span> 的一個例子。"},
+        {w: "Artificial intelligence", z: "人工智慧", s: "[_____] can help with tasks like data analysis.", st: "<span class='hl'>AI</span> 可以幫助處理數據分析等任務。"},
+        {w: "ChatGPT", z: "ChatGPT", s: "[_____] can help answer your questions.", st: "<span class='hl'>ChatGPT</span> 可以幫助回答你的問題。"},
+        {w: "Interaction", z: "互動", s: "Our [_____] with the new system was smooth.", st: "我們與新系統的 <span class='hl'>互動</span> 很順暢。"},
+        {w: "Degree", z: "程度", s: "There is a high [_____] of trust in this technology.", st: "對這項技術有很高 <span class='hl'>程度</span> 的信任。"},
+        {w: "Menial", z: "卑微的", s: "The robot handles [_____] tasks, freeing up workers for complex jobs.", st: "機器人處理 <span class='hl'>體力勞動</span>，讓工人有時間從事複雜的工作。"},
+        {w: "Field", z: "領域", s: "He is an expert in the [_____] of robotics.", st: "他是機器人 <span class='hl'>領域</span> 的專家。"},
+        {w: "To overshadow", z: "使相形見絀", s: "The new product [_____]ed last year’s model.", st: "新產品使去年的型號 <span class='hl'>相形見絀</span>。"},
+        {w: "To transform", z: "轉型", s: "AI has the potential to [_____] many industries.", st: "AI 有潛力使許多行業 <span class='hl'>轉型</span>。"},
+        {w: "To adapt", z: "適應", s: "Businesses must [_____] to stay competitive.", st: "企業必須 <span class='hl'>適應</span> 環境以保持競爭力。"},
+        {w: "Real-world", z: "現實世界的", s: "We need [_____] solutions to these problems.", st: "我們需要解決這些問題的 <span class='hl'>現實世界</span> 方案。"},
+        {w: "Pre-programmed", z: "預先編程的", s: "The robot follows [_____] routines.", st: "機器人遵循 <span class='hl'>預先編程</span> 好的常規動作。"},
+        {w: "Autonomously", z: "自主地", s: "The drone can fly [_____].", st: "無人機可以 <span class='hl'>自主</span> 飛行。"},
+        {w: "Reliable", z: "可靠的", s: "This system is very [_____] and rarely fails.", st: "這個系統非常 <span class='hl'>可靠</span>，很少出故障。"},
+        {w: "Algorithm", z: "演算法", s: "Search engines use complex [_____]s to find results.", st: "搜尋引擎使用複雜的 <span class='hl'>演算法</span> 來查找結果。"},
+        {w: "Best of both worlds", z: "兩全其美", s: "This hybrid car offers the [_____]: efficiency and power.", st: "這款混合動力車兼具效率與動力，是 <span class='hl'>兩全其美</span> 的選擇。"},
+        {w: "Confined", z: "受限的", s: "The experiment was [_____] to the lab.", st: "實驗 <span class='hl'>受限</span> 於實驗室內進行。"},
+        {w: "Setting", z: "環境", s: "The conference took place in a formal [_____].", st: "會議在一個正式的 <span class='hl'>場合</span> 舉行。"},
+        {w: "Crisis", z: "危機", s: "The company managed to survive the financial [_____].", st: "公司成功在金融 <span class='hl'>危機</span> 中倖存下來。"},
+        {w: "To relieve", z: "緩解", s: "This medicine helps to [_____] pain.", st: "這種藥有助於 <span class='hl'>緩解</span> 疼痛。"},
+        {w: "Transition", z: "過渡", s: "The [_____] to remote work was smooth.", st: "向遠端辦公的 <span class='hl'>轉變</span> 很順利。"},
+        {w: "Well into the future", z: "深入未來", s: "These changes will affect us [_____].", st: "這些變化將在 <span class='hl'>未來很長一段時間內</span> 影響我們。"},
+        {w: "Interference", z: "干擾", s: "[_____] in the system caused delays.", st: "系統中的 <span class='hl'>干擾</span> 導致了延遲。"},
+        {w: "To free up", z: "釋放", s: "Automating tasks can [_____] employees for more important work.", st: "自動化任務可以 <span class='hl'>釋放</span> 員工的時間去做更重要的工作。"},
+        {w: "In short", z: "簡而言之", s: "[_____], we need to improve our processes.", st: "<span class='hl'>簡而言之</span>，我們需要改進我們的流程。"},
+        {w: "Work-life balance", z: "工作與生活平衡", s: "Flexible hours can improve [_____].", st: "彈性工時可以改善 <span class='hl'>工作與生活的平衡</span>。"},
+        {w: "Game-changing", z: "改變遊戲規則的", s: "This new technology is [_____] for the industry.", st: "這項新技術對該行業具有 <span class='hl'>改變遊戲規則</span> 的意義。"}
     ]
 };
 
-// **為了讓程式碼能跑，這裡我先放回完整的資料庫內容 (避免複製貼上出錯)**
-// (實際檔案請用上一則回覆的完整資料庫替換這裡)
-// 為確保你能直接複製使用，這裡我會把前面的完整資料庫再貼一次:
-database.deepseek = [
-    {w: "Artificial Intelligence", z: "人工智慧", s: "[_____] helps businesses automate customer service through chatbots.", st: "<span class='hl'>人工智慧</span> 幫助企業透過聊天機器人自動化客戶服務。"},
-    {w: "To make waves", z: "引起轟動/風波", s: "The new AI company is [_____] with its groundbreaking technology.", st: "這家新 AI 公司憑藉其突破性技術在業界 <span class='hl'>引起轟動</span>。"},
-    {w: "DeepSeek", z: "DeepSeek (公司名)", s: "[_____] has introduced a powerful AI model that challenges industry leaders.", st: "<span class='hl'>DeepSeek</span> 推出了一款強大的 AI 模型，挑戰行業領導者。"},
-    {w: "Lab", z: "實驗室", s: "The AI [_____] is working on new algorithms to improve machine learning.", st: "AI <span class='hl'>實驗室</span> 正在研究新演算法以改進機器學習。"},
-    {w: "To upend expectations", z: "顛覆預期", s: "DeepSeek’s new AI model has [_____] in the tech world.", st: "DeepSeek 的新 AI 模型 <span class='hl'>顛覆了預期</span> 在科技界。"},
-    {w: "To draw attention", z: "吸引注意", s: "The startup [_____] after announcing a major breakthrough in AI.", st: "這家新創公司在宣布 AI 重大突破後 <span class='hl'>吸引了注意</span>。"},
-    {w: "Player", z: "參與者/要角", s: "DeepSeek has quickly become a key [_____] in the AI field.", st: "DeepSeek 迅速成為 AI 領域的關鍵 <span class='hl'>要角</span>。"},
-    {w: "Field", z: "領域", s: "AI is a rapidly growing [_____] with many new opportunities.", st: "AI 是一個快速成長的 <span class='hl'>領域</span>，充滿新機會。"},
-    {w: "Giant", z: "巨頭/大公司", s: "Tech [_____]s like Google and Microsoft are competing in AI development.", st: "像 Google 和微軟這樣的科技 <span class='hl'>巨頭</span> 正在競爭 AI 開發。"},
-    {w: "To redefine", z: "重新定義", s: "DeepSeek aims [_____] how AI models process information.", st: "DeepSeek 旨在 <span class='hl'>重新定義</span> AI 模型處理資訊的方式。"},
-    {w: "To kick off", z: "啟動/開始", s: "The company [_____]ed its AI research with a new lab in Shanghai.", st: "公司以在上海的新實驗室 <span class='hl'>啟動</span> 了其 AI 研究。"},
-    {w: "To stun", z: "使震驚", s: "The accuracy of the AI model [_____]ned experts in the industry.", st: "AI 模型的準確性 <span class='hl'>震驚</span> 了業界專家。"},
-    {w: "To reveal", z: "揭露/展示", s: "The company [_____]ed its latest AI project at the tech conference.", st: "公司在科技會議上 <span class='hl'>展示</span> 了其最新的 AI 專案。"},
-    {w: "Technical recipe", z: "技術配方/秘訣", s: "The researchers shared the [_____] for training AI models efficiently.", st: "研究人員分享了有效訓練 AI 模型的 <span class='hl'>技術配方</span>。"},
-    {w: "Cutting-edge", z: "尖端的", s: "DeepSeek’s [_____] AI technology is attracting major investors.", st: "DeepSeek 的 <span class='hl'>尖端</span> AI 技術正在吸引主要投資者。"},
-    {w: "AI model", z: "AI 模型", s: "This [_____] can generate human-like text with high accuracy.", st: "這個 <span class='hl'>AI 模型</span> 可以高準確度地生成類人文本。"},
-    {w: "To transform", z: "改變/轉型", s: "AI has [_____]ed the way businesses analyze data and make decisions.", st: "AI 已經徹底 <span class='hl'>改變</span> 了企業分析數據和做決策的方式。"},
-    {w: "Reclusive", z: "隱居的/低調的", s: "The [_____] AI researcher rarely gives interviews.", st: "這位 <span class='hl'>低調的</span> AI 研究員鮮少接受採訪。"},
-    {w: "To defy", z: "違抗/挑戰", s: "DeepSeek’s latest project [_____]ies traditional AI development methods.", st: "DeepSeek 的最新專案 <span class='hl'>挑戰</span> 了傳統的 AI 開發方法。"},
-    {w: "Ambitions", z: "抱負/野心", s: "The company’s [_____] include becoming a leader in AI research.", st: "公司的 <span class='hl'>抱負</span> 包括成為 AI 研究的領導者。"},
-    {w: "Founded", z: "創立於", s: "DeepSeek was [_____] by a group of AI researchers in China.", st: "DeepSeek 是由一群中國的 AI 研究人員 <span class='hl'>創立</span> 的。"},
-    {w: "Hedge fund", z: "避險基金", s: "The [_____] invested millions in AI startups.", st: "這家 <span class='hl'>避險基金</span> 投資了數百萬在 AI 新創公司。"},
-    {w: "R1 model", z: "R1 模型", s: "The [_____] has shown impressive language processing capabilities.", st: "<span class='hl'>R1 模型</span> 展現了令人印象深刻的語言處理能力。"},
-    {w: "Paper", z: "論文/文件", s: "Their [_____] on AI ethics was widely discussed in the tech community.", st: "他們關於 AI 倫理的 <span class='hl'>論文</span> 在科技界被廣泛討論。"},
-    {w: "Large language model", z: "大型語言模型", s: "GPT-4 is a well-known [_____] used for various applications.", st: "GPT-4 是一個用於各種應用的著名 <span class='hl'>大型語言模型</span>。"},
-    {w: "Bootstrapped", z: "白手起家", s: "The startup was [_____] for years before receiving funding.", st: "這家新創在獲得資金前 <span class='hl'>白手起家</span> 多年。"},
-    {w: "Landscape", z: "局勢/景觀", s: "The AI [_____] is constantly changing with new advancements.", st: "隨著新進展，AI <span class='hl'>局勢</span> 不斷在變化。"},
-    {w: "To dominate", z: "主導/支配", s: "Big tech companies [_____] the AI sector with their advanced models.", st: "大型科技公司憑藉先進模型 <span class='hl'>主導</span> 了 AI 領域。"},
-    {w: "Deep pockets", z: "財力雄厚", s: "Companies with [_____] can afford to invest heavily in AI research.", st: "<span class='hl'>財力雄厚</span> 的公司負擔得起在 AI 研究上的大量投資。"},
-    {w: "Vast", z: "廣大的/巨大的", s: "The AI model was trained on a [_____] amount of data from the internet.", st: "該 AI 模型是基於網路上 <span class='hl'>巨大</span> 數量的數據訓練的。"},
-    {w: "Breakthrough", z: "突破", s: "The development of DeepSeek’s AI model was a [_____] in natural language processing.", st: "DeepSeek AI 模型的開發是自然語言處理的一項 <span class='hl'>突破</span>。"},
-    {w: "Innovation", z: "創新", s: "AI-driven automation is one of the biggest [_____]s in the business world.", st: "AI 驅動的自動化是商業世界最大的 <span class='hl'>創新</span> 之一。"},
-    {w: "To gain traction", z: "獲得關注/動力", s: "DeepSeek’s AI model is [_____] among developers and businesses.", st: "DeepSeek 的 AI 模型在開發者與企業間 <span class='hl'>獲得關注</span>。"},
-    {w: "To shift", z: "轉移/改變", s: "The company [_____]ed its focus from traditional AI to large language models.", st: "公司將重心從傳統 AI <span class='hl'>轉移</span> 到大型語言模型。"},
-    {w: "Accessible", z: "易取得的", s: "The new AI platform is [_____] to businesses of all sizes.", st: "新的 AI 平台對各種規模的企業都是 <span class='hl'>易取得的</span>。"},
-    {w: "To rethink", z: "重新思考", s: "Companies are [_____]ing their strategies because of AI advancements.", st: "企業正因 AI 的進步而 <span class='hl'>重新思考</span> 他們的策略。"},
-    {w: "Exorbitant", z: "過高的/昂貴的", s: "Training large AI models requires an [_____] amount of computing power.", st: "訓練大型 AI 模型需要 <span class='hl'>過高</span> 的運算能力。"},
-    {w: "Reasoning", z: "推理", s: "The AI model has strong [_____] skills and can analyze complex problems.", st: "該 AI 模型有很強的 <span class='hl'>推理</span> 能力，能分析複雜問題。"},
-    {w: "Opening", z: "機會/缺口", s: "DeepSeek’s success created an [_____] for smaller AI startups to compete.", st: "DeepSeek 的成功為較小的 AI 新創創造了競爭 <span class='hl'>機會</span>。"},
-    {w: "Outside investment", z: "外部投資", s: "The company secured [_____] to expand its AI research.", st: "公司獲得了 <span class='hl'>外部投資</span> 以擴張其 AI 研究。"},
-    {w: "Paradigm shift", z: "典範轉移", s: "AI is causing a [_____] in how businesses operate.", st: "AI 正在商業運作模式中引起 <span class='hl'>典範轉移</span>。"},
-    {w: "Democratized", z: "普及化/大眾化", s: "Open-source AI tools have [_____] access to advanced technology.", st: "開源 AI 工具已將先進技術的使用權 <span class='hl'>普及化</span>。"},
-    {w: "To host", z: "託管", s: "The company [_____]s its AI model on a cloud server to ensure fast and reliable access.", st: "公司將其 AI 模型 <span class='hl'>託管</span> 在雲端伺服器以確保快速可靠的存取。"},
-    {w: "In isolation", z: "孤立地", s: "The data must be analyzed [_____] to understand its impact.", st: "數據必須被 <span class='hl'>孤立地</span> 分析以了解其影響。"},
-    {w: "Interests", z: "利益", s: "Tech companies have strong [_____] in AI development.", st: "科技公司在 AI 開發方面有龐大的 <span class='hl'>利益</span>。"},
-    {w: "Origins", z: "起源", s: "The [_____] of DeepSeek’s AI research can be traced back to university labs.", st: "DeepSeek AI 研究的 <span class='hl'>起源</span> 可追溯至大學實驗室。"},
-    {w: "Powerhouse", z: "強大集團", s: "DeepSeek is becoming a [_____] in the AI industry.", st: "DeepSeek 正成為 AI 產業中的 <span class='hl'>強大集團</span>。"},
-    {w: "To shed light on", z: "闡明/解釋", s: "The report [_____]s the risks of AI automation in finance.", st: "報告 <span class='hl'>闡明</span> 了金融領域 AI 自動化的風險。"},
-    {w: "Controlling shareholder", z: "控股股東", s: "The [_____] approved the company’s expansion into AI.", st: "<span class='hl'>控股股東</span> 批准了公司擴張至 AI 領域。"},
-    {w: "To co-found", z: "共同創立", s: "He [_____]ed an AI startup focused on deep learning research.", st: "他 <span class='hl'>共同創立</span> 了一家專注於深度學習研究的 AI 新創。"},
-    {w: "Quantitative hedge fund", z: "量化避險基金", s: "The [_____] relies on AI to analyze market trends.", st: "這家 <span class='hl'>量化避險基金</span> 依賴 AI 來分析市場趨勢。"},
-    {w: "Driven", z: "受驅使的", s: "The company is [_____] by a vision to make AI more accessible.", st: "公司 <span class='hl'>受...驅使</span>「讓 AI 更普及」的願景。"},
-    {w: "Trading strategies", z: "交易策略", s: "AI is now used to develop more advanced [_____].", st: "AI 現在被用於開發更先進的 <span class='hl'>交易策略</span>。"},
-    {w: "Arm", z: "部門/分支", s: "The company’s AI research [_____] is working on a new language model.", st: "公司的 AI 研究 <span class='hl'>部門</span> 正在開發一個新的語言模型。"},
-    {w: "To explore", z: "探索", s: "They are [_____]ing ways to integrate AI into healthcare.", st: "他們正在 <span class='hl'>探索</span> 將 AI 整合到醫療保健中的方式。"},
-    {w: "Artificial General Intelligence", z: "通用人工智慧 (AGI)", s: "Many researchers believe [_____] is still decades away.", st: "許多研究人員相信 <span class='hl'>通用人工智慧</span> 還需數十年。"},
-    {w: "Global scene", z: "全球舞台", s: "DeepSeek is making a name for itself on the [_____].", st: "DeepSeek 在 <span class='hl'>全球舞台</span> 上正打響名號。"},
-    {w: "Hype", z: "炒作", s: "The [_____] around AI-powered chatbots has led to increased investment.", st: "圍繞 AI 聊天機器人的 <span class='hl'>炒作</span> 導致了投資增加。"},
-    {w: "Bullishness", z: "看漲/樂觀", s: "Investors' [_____] on AI stocks has driven market growth.", st: "投資者對 AI 股票的 <span class='hl'>看漲</span> 情緒推動了市場成長。"},
-    {w: "To inspire", z: "啟發/激勵", s: "DeepSeek’s breakthrough has [_____]d new AI startups.", st: "DeepSeek 的突破 <span class='hl'>啟發</span> 了新的 AI 新創公司。"},
-    {w: "Frenzy", z: "狂熱", s: "The AI investment [_____] has led to skyrocketing stock prices.", st: "AI 投資 <span class='hl'>狂熱</span> 導致了股價飛漲。"},
-    {w: "Chipmaker", z: "晶片製造商", s: "Major [_____]s are racing to develop faster processors for AI.", st: "主要 <span class='hl'>晶片製造商</span> 正競相開發更快的 AI 處理器。"},
-    {w: "Blind spot", z: "盲點", s: "Many companies have a [_____] when it comes to AI ethics.", st: "許多公司在 AI 倫理方面有 <span class='hl'>盲點</span>。"},
-    {w: "To turn something upside down", z: "徹底翻轉", s: "AI has [_____] the job market [_____] by automating many roles.", st: "AI 透過自動化許多職位，<span class='hl'>徹底翻轉</span> 了就業市場。"},
-    {w: "Wall Street", z: "華爾街", s: "[_____] is closely watching the rise of AI-driven businesses.", st: "<span class='hl'>華爾街</span> 正密切關注 AI 驅動企業的崛起。"},
-    {w: "To drop", z: "下跌", s: "AI stocks [_____]ped sharply after the company’s disappointing earnings report.", st: "在公司令人失望的財報後，AI 股票大幅 <span class='hl'>下跌</span>。"},
-    {w: "S&P 500", z: "標普500指數", s: "AI companies now make up a significant portion of the [_____].", st: "AI 公司現在佔 <span class='hl'>標普500指數</span> 的重要部分。"},
-    {w: "Sector", z: "部門/領域", s: "The tech [_____] has seen massive investment in AI development.", st: "科技 <span class='hl'>領域</span> 在 AI 開發上見證了巨額投資。"},
-    {w: "Decline", z: "衰退/下降", s: "The [_____] in semiconductor sales affected AI research funding.", st: "半導體銷售的 <span class='hl'>下降</span> 影響了 AI 研究資金。"},
-    {w: "Bloodbath", z: "慘敗/大屠殺", s: "The stock market [_____] wiped out billions in AI funding.", st: "股市的 <span class='hl'>慘敗</span> 抹去了數十億的 AI 資金。"},
-    {w: "To wipe out", z: "徹底摧毀", s: "The market crash [_____]d years of AI investment gains.", st: "市場崩盤 <span class='hl'>徹底摧毀</span> 了多年的 AI 投資收益。"},
-    {w: "Stock picker", z: "選股者", s: "[_____]s are betting on AI companies for high returns.", st: "<span class='hl'>選股者</span> 正押注 AI 公司以獲得高報酬。"},
-    {w: "Euphoria", z: "狂喜/亢奮", s: "The early success of AI startups created a sense of [_____] among investors.", st: "AI 新創的早期成功在投資者間創造了一種 <span class='hl'>亢奮感</span>。"},
-    {w: "To reach heights", z: "達到新高度", s: "The AI industry has [_____] new [_____] with recent breakthroughs.", st: "AI 產業憑藉近期的突破 <span class='hl'>達到了新高度</span>。"},
-    {w: "Unsustainable", z: "不可持續的", s: "The rapid growth of AI investments may be [_____] in the long term.", st: "AI 投資的快速成長長期來看可能是 <span class='hl'>不可持續的</span>。"},
-    {w: "Shake-up", z: "劇變/改組", s: "The rise of AI has led to a [_____] in the job market.", st: "AI 的崛起導致了就業市場的 <span class='hl'>劇變</span>。"},
-    {w: "To fuel", z: "加劇/助長", s: "AI research is [_____]ing competition between major tech firms.", st: "AI 研究正在 <span class='hl'>加劇</span> 主要科技公司間的競爭。"},
-    {w: "Arms race", z: "軍備競賽", s: "The AI [_____] has led to massive investment in machine learning.", st: "AI <span class='hl'>軍備競賽</span> 導致了對機器學習的巨額投資。"},
-    {w: "To scale back", z: "縮減", s: "The company had [_____] its AI projects due to funding cuts.", st: "由於資金削減，公司不得不 <span class='hl'>縮減</span> 其 AI 專案。"},
-    {w: "To double down", z: "加倍下注", s: "Despite setbacks, the company is [_____]ing on AI research.", st: "儘管遭受挫折，公司仍對 AI 研究 <span class='hl'>加倍下注</span>。"},
-    {w: "To pour", z: "傾注/投入", s: "Investors are [_____]ing billions into AI startups.", st: "投資者正將數十億 <span class='hl'>傾注</span> 於 AI 新創公司。"},
-    {w: "Aggressive", z: "積極的", s: "The company’s [_____] expansion into AI is reshaping the industry.", st: "公司對 AI 的 <span class='hl'>積極</span> 擴張正在重塑產業。"},
-    {w: "To stay ahead", z: "保持領先", s: "Tech giants are constantly innovating [_____] in AI development.", st: "科技巨頭不斷創新以在 AI 開發中 <span class='hl'>保持領先</span>。"},
-    {w: "Unpredictable", z: "不可預測的", s: "The impact of AI on jobs remains [_____].", st: "AI 對就業的影響仍然 <span class='hl'>不可預測</span>。"},
-    {w: "Big Tech", z: "大型科技公司", s: "[_____] is leading the way in AI advancements.", st: "<span class='hl'>大型科技公司</span> 正在引領 AI 的進步。"},
-    {w: "Unchecked", z: "不受控制的", s: "There are concerns about the [_____] growth of AI in sensitive areas like surveillance.", st: "人們對 AI 在監控等敏感領域 <span class='hl'>不受控制</span> 的增長感到擔憂。"},
-    {w: "To top", z: "超過", s: "The new AI startup [_____]ped its funding goal in just a few days.", st: "這家新創在短短幾天內就 <span class='hl'>超過</span> 了其融資目標。"},
-    {w: "Rival", z: "競爭對手", s: "DeepSeek is becoming a strong [_____] to established AI companies.", st: "DeepSeek 正成為既有 AI 公司的強大 <span class='hl'>競爭對手</span>。"},
-    {w: "Infrastructure", z: "基礎建設", s: "AI models require powerful cloud [_____] to function efficiently.", st: "AI 模型需要強大的雲端 <span class='hl'>基礎建設</span> 才能高效運作。"},
-    {w: "To surge", z: "激增", s: "Investment in AI startups has [_____]d in the past year.", st: "過去一年對 AI 新創的投資 <span class='hl'>激增</span>。"},
-    {w: "Historic levels", z: "歷史水平", s: "AI stock prices have reached [_____] due to growing demand.", st: "由於需求增長，AI 股價已達到 <span class='hl'>歷史水平</span>。"},
-    {w: "To vow", z: "誓言/鄭重宣告", s: "The company [_____]ed to develop AI responsibly and ethically.", st: "公司 <span class='hl'>誓言</span> 要負責任且合乎道德地開發 AI。"},
-    {w: "To accelerate", z: "加速", s: "The new AI chips will [_____] machine learning development.", st: "新的 AI 晶片將 <span class='hl'>加速</span> 機器學習的發展。"},
-    {w: "To dismiss", z: "駁回/不予理會", s: "The CEO [_____]ed concerns about AI replacing human jobs.", st: "執行長 <span class='hl'>駁回</span> 了關於 AI 取代人類工作的擔憂。"},
-    {w: "To bet on", z: "押注於", s: "Investors are [_____]ing AI to drive the future of technology.", st: "投資者 <span class='hl'>押注於</span> AI 將驅動科技的未來。"},
-    {w: "Nascent", z: "新生的", s: "The [_____] AI industry is evolving rapidly with new breakthroughs.", st: "<span class='hl'>新生的</span> AI 產業隨著新突破迅速演變。"},
-    {w: "To loom large", z: "顯得突出", s: "Concerns about AI regulation [_____] among tech leaders.", st: "AI 監管的擔憂在科技領袖間 <span class='hl'>顯得突出</span>。"},
-    {w: "To dictate", z: "支配/決定", s: "Market trends [_____] how companies invest in AI technology.", st: "市場趨勢 <span class='hl'>支配</span> 著公司如何投資 AI 技術。"},
-    {w: "Dominant", z: "佔優勢的", s: "A few [_____] companies control much of the AI research space.", st: "少數 <span class='hl'>佔優勢的</span> 公司控制了大部分 AI 研究領域。"},
-    {w: "Challengers", z: "挑戰者", s: "New AI startups are emerging as [_____] to Big Tech.", st: "新的 AI 新創正作為 Big Tech 的 <span class='hl'>挑戰者</span> 出現。"},
-    {w: "To reshape", z: "重塑", s: "AI is [_____]ing industries from healthcare to finance.", st: "AI 正在 <span class='hl'>重塑</span> 從醫療到金融的各行各業。"},
-    {w: "Business model", z: "商業模式", s: "AI is forcing companies to rethink their [_____]s.", st: "AI 正迫使公司重新思考其 <span class='hl'>商業模式</span>。"},
-    {w: "To emerge", z: "出現/浮現", s: "China has [_____]d as a major player in AI research.", st: "中國已 <span class='hl'>浮現</span> 為 AI 研究的主要參與者。"},
-    {w: "Phase", z: "階段", s: "The AI project is entering its final testing [_____].", st: "AI 專案正進入最後的測試 <span class='hl'>階段</span>。"},
-    {w: "Researcher", z: "研究員", s: "AI [_____]s are working to improve machine learning algorithms.", st: "AI <span class='hl'>研究員</span> 正在改進機器學習演算法。"},
-    {w: "Release", z: "發布", s: "The company announced the [_____] of its latest AI model.", st: "公司宣布 <span class='hl'>發布</span> 其最新的 AI 模型。"},
-    {w: "Moat", z: "護城河(競爭優勢)", s: "DeepSeek’s access to massive datasets gives it a strong [_____] in AI development.", st: "DeepSeek 對海量數據的存取給了它在 AI 開發上的強大 <span class='hl'>護城河</span>。"},
-    {w: "To train", z: "訓練", s: "The team [_____]ed the AI model using millions of text documents.", st: "團隊使用數百萬份文檔 <span class='hl'>訓練</span> 了 AI 模型。"},
-    {w: "To expend", z: "消耗", s: "Training large AI models [_____]s massive computing power.", st: "訓練大型 AI 模型 <span class='hl'>消耗</span> 大量運算能力。"},
-    {w: "Mover", z: "推動者", s: "DeepSeek is a key [_____] in the AI space, pushing new innovations.", st: "DeepSeek 是 AI 領域的關鍵 <span class='hl'>推動者</span>，推動新創新。"}
-];
-
-database.robots = [
-    {w: "Generative AI", z: "生成式 AI", s: "[_____] can write stories and create images.", st: "<span class='hl'>生成式 AI</span> 可以撰寫故事並創作圖像。"},
-    {w: "To grab headlines", z: "吸引大眾關注", s: "The new technology [_____] around the world.", st: "這項新技術在世界各地 <span class='hl'>吸引了大眾關注</span>。"},
-    {w: "Robotics", z: "機器人技術", s: "[_____] is used to build machines that can do work for humans.", st: "<span class='hl'>機器人技術</span> 被用來建造可以為人類工作的機器。"},
-    {w: "Rapid clip", z: "速度極快", s: "Technology is advancing at a [_____] these days.", st: "如今科技正以 <span class='hl'>極快的速度</span> 進步。"},
-    {w: "Robot", z: "機器人", s: "The factory uses [_____]s to assemble cars.", st: "這家工廠使用 <span class='hl'>機器人</span> 來組裝汽車。"},
-    {w: "Spotlight", z: "關注焦點", s: "The new product was in the [_____] at the tech show.", st: "新產品在科技展上成為了 <span class='hl'>關注焦點</span>。"},
-    {w: "Mass media", z: "大眾媒體", s: "The [_____] reported on the new invention.", st: "<span class='hl'>大眾媒體</span> 報導了這項新發明。"},
-    {w: "To boom", z: "繁榮/大漲", s: "The tech industry continues [_____].", st: "科技產業持續 <span class='hl'>繁榮發展</span>。"},
-    {w: "Stock", z: "庫存", s: "The store has a large [_____] of electronics.", st: "這家店有大量的電子產品 <span class='hl'>庫存</span>。"},
-    {w: "Operational", z: "運作中的", s: "The new system will be [_____] next month.", st: "新系統將於下個月 <span class='hl'>投入運作</span>。"},
-    {w: "Unit", z: "單位/個體", s: "Each [_____] is tested before leaving the factory.", st: "每個 <span class='hl'>單元</span> 在出廠前都會經過測試。"},
-    {w: "Value", z: "價值", s: "The [_____] of the software lies in its simplicity.", st: "該軟體的 <span class='hl'>價值</span> 在於其簡單性。"},
-    {w: "Installation", z: "安裝", s: "The [_____] of the new machines took two days.", st: "新機器的 <span class='hl'>安裝</span> 花了兩天時間。"},
-    {w: "Estimated", z: "估計的", s: "The project will be completed in an [_____] six months.", st: "該專案預計將在 <span class='hl'>估計</span> 六個月內完成。"},
-    {w: "To play a role", z: "發揮作用", s: "Technology [_____]s a big role in our daily lives.", st: "科技在我們的日常生活中 <span class='hl'>發揮了重要作用</span>。"},
-    {w: "Fundamental", z: "基礎的", s: "Trust is [_____] to any relationship.", st: "信任對於任何關係都是 <span class='hl'>基礎的</span>。"},
-    {w: "Demands", z: "需求/要求", s: "The job has high [_____], but it's rewarding.", st: "這份工作 <span class='hl'>要求</span> 很高，但回報豐厚。"},
-    {w: "To call to mind", z: "使想起", s: "The smell of cookies [_____]s my grandmother's kitchen.", st: "餅乾的味道讓我 <span class='hl'>想起</span> 祖母的廚房。"},
-    {w: "Automotive", z: "汽車的", s: "The [_____] industry is investing in electric cars.", st: "<span class='hl'>汽車</span> 產業正在投資電動車。"},
-    {w: "Early adopter", z: "早期採用者", s: "As an [_____], he always has the latest gadgets.", st: "作為一個 <span class='hl'>早期採用者</span>，他總是擁有最新的小工具。"},
-    {w: "To deploy", z: "部署", s: "The company will [_____] new software next week.", st: "公司將於下週 <span class='hl'>部署</span> 新軟體。"},
-    {w: "Scale", z: "規模", s: "We need to increase the [_____] of our operations.", st: "我們需要擴大營運的 <span class='hl'>規模</span>。"},
-    {w: "Assembly-line", z: "組裝線", s: "Cars are built on an [_____] to speed up production.", st: "汽車在 <span class='hl'>組裝線</span> 上製造以加快生產速度。"},
-    {w: "Application", z: "應用/用途", s: "This app has many practical [_____]s.", st: "這個應用程式有許多實際的 <span class='hl'>用途</span>。"},
-    {w: "SME", z: "中小企業", s: "[_____]s play a crucial role in the economy.", st: "<span class='hl'>中小企業</span> 在經濟中扮演關鍵角色。"},
-    {w: "Collaborative", z: "協作的", s: "We use [_____] tools to improve teamwork.", st: "我們使用 <span class='hl'>協作</span> 工具來改善團隊合作。"},
-    {w: "Cobot", z: "協作機器人", s: "[_____]s help workers in factories by handling repetitive tasks.", st: "<span class='hl'>協作機器人</span> 透過處理重複性任務來幫助工廠工人。"},
-    {w: "Customizable", z: "可客製化的", s: "The software is [_____] to fit each user's preferences.", st: "該軟體是 <span class='hl'>可客製化的</span>，以符合每個使用者的偏好。"},
-    {w: "Automation", z: "自動化", s: "[_____] in factories speeds up production.", st: "工廠的 <span class='hl'>自動化</span> 加快了生產速度。"},
-    {w: "Tempting", z: "誘人的", s: "The offer is [_____], but I need to think about it.", st: "這個提議很 <span class='hl'>誘人</span>，但我需要考慮一下。"},
-    {w: "Startup", z: "新創公司", s: "He invested in a tech [_____] that's developing innovative apps.", st: "他投資了一家正在開發創新 App 的科技 <span class='hl'>新創公司</span>。"},
-    {w: "Traditional", z: "傳統的", s: "[_____] cooking methods are still popular today.", st: "<span class='hl'>傳統</span> 烹飪方法在今天仍然很受歡迎。"},
-    {w: "Affordability", z: "可負擔性", s: "The [_____] of the product makes it accessible to more people.", st: "產品的 <span class='hl'>價格親民</span> 使其能被更多人接受。"},
-    {w: "Versatility", z: "多功能性", s: "The tool's [_____] makes it useful for various tasks.", st: "這個工具的 <span class='hl'>多功能性</span> 使其適用於各種任務。"},
-    {w: "To implement", z: "實施", s: "The company plans [_____] new policies next year.", st: "公司計畫明年 <span class='hl'>實施</span> 新政策。"},
-    {w: "To scale", z: "擴大規模", s: "We need [_____] our production to meet demand.", st: "我們需要 <span class='hl'>擴大</span> 生產以滿足需求。"},
-    {w: "To enhance", z: "提升", s: "We added features [_____] the user experience.", st: "我們增加了功能以 <span class='hl'>提升</span> 使用者體驗。"},
-    {w: "Quality control", z: "品質管理", s: "[_____] is essential in manufacturing.", st: "<span class='hl'>品質控制</span> 在製造業中至關重要。"},
-    {w: "Perspective", z: "觀點", s: "From her [_____], the solution was simple.", st: "從她的 <span class='hl'>觀點</span> 來看，解決方案很簡單。"},
-    {w: "Flesh and blood", z: "真人/血肉之軀", s: "It's hard to believe the robot isn't [_____].", st: "很難相信這機器人不是 <span class='hl'>真人</span>。"},
-    {w: "Repetitive", z: "重複的", s: "The job is [_____], but it pays well.", st: "這工作很 <span class='hl'>重複</span>，但薪水不錯。"},
-    {w: "Soul-destroying", z: "枯燥乏味的", s: "Filling out endless forms is [_____].", st: "填寫無止盡的表格是 <span class='hl'>極其枯燥乏味的</span>。"},
-    {w: "Prone to error", z: "易出錯的", s: "Human workers are more [_____] than machines.", st: "人類工人比機器更 <span class='hl'>容易出錯</span>。"},
-    {w: "To prompt", z: "促使", s: "The announcement [_____]ed a lot of questions.", st: "這項公告 <span class='hl'>引起</span> 了許多問題。"},
-    {w: "To embrace", z: "擁抱/採納", s: "They decided [_____] new technologies in their work.", st: "他們決定在工作中 <span class='hl'>採納</span> 新技術。"},
-    {w: "Emerging", z: "新興的", s: "[_____] markets offer new opportunities for investors.", st: "<span class='hl'>新興</span> 市場為投資者提供了新機會。"},
-    {w: "Routine", z: "例行公事", s: "Having a morning [_____] helps me stay organized.", st: "擁有早晨的 <span class='hl'>例行公事</span> 幫助我保持條理。"},
-    {w: "Bot", z: "機器人程式", s: "Chat[_____]s help answer customer queries online.", st: "聊天 <span class='hl'>機器人</span> 幫助在線上回答客戶詢問。"},
-    {w: "Use case", z: "應用案例", s: "This software has many [_____]s in different industries.", st: "這套軟體在不同產業有許多 <span class='hl'>應用案例</span>。"},
-    {w: "To range", z: "範圍涉及", s: "Prices [_____] from $10 to $50 depending on the model.", st: "價格 <span class='hl'>範圍</span> 依型號從 10 到 50 美元不等。"},
-    {w: "Enterprise", z: "企業", s: "The [_____] expanded its operations globally.", st: "這家 <span class='hl'>企業</span> 將業務擴展到了全球。"},
-    {w: "To trigger", z: "觸發", s: "The alarm was [_____]ed by a security breach.", st: "警報是由安全漏洞 <span class='hl'>觸發</span> 的。"},
-    {w: "To manipulate", z: "操縱", s: "He knows how [_____] the data to get the results he wants.", st: "他知道如何 <span class='hl'>操縱</span> 數據以獲得他想要的結果。"},
-    {w: "Ubiquitous", z: "無所不在的", s: "Smartphones have become [_____] in modern life.", st: "智慧型手機在現代生活中已變得 <span class='hl'>無所不在</span>。"},
-    {w: "Embedded", z: "嵌入的", s: "The sensors are [_____] in the factory floor.", st: "感測器被 <span class='hl'>嵌入</span> 在工廠地板中。"},
-    {w: "Factory floor", z: "工廠作業區", s: "Workers on the [_____] are using new machines.", st: "<span class='hl'>工廠作業區</span> 的工人們正在使用新機器。"},
-    {w: "Boon", z: "益處/福音", s: "The new software is a [_____] to our productivity.", st: "新軟體對我們的生產力是一大 <span class='hl'>福音</span>。"},
-    {w: "Recruitment", z: "招募", s: "The company is focusing on [_____] to fill open positions.", st: "公司正專注於 <span class='hl'>招募</span> 以填補空缺職位。"},
-    {w: "Retention", z: "留任", s: "Improving work conditions helps with employee [_____].", st: "改善工作條件有助於員工 <span class='hl'>留任</span>。"},
-    {w: "Prominent", z: "傑出的", s: "She is a [_____] figure in the tech industry.", st: "她是科技界一位 <span class='hl'>傑出的</span> 人物。"},
-    {w: "Case in point", z: "佐證實例", s: "He is always late, [_____], he missed today's meeting.", st: "他總是遲到，<span class='hl'>舉例來說</span>，他錯過了今天的會議。"},
-    {w: "To hold promise", z: "有潛力", s: "The new technology [_____]s for many applications.", st: "這項新技術在許多應用上 <span class='hl'>展現了潛力</span>。"},
-    {w: "To perform", z: "執行", s: "The robot can [_____] various tasks with precision.", st: "機器人可以精確地 <span class='hl'>執行</span> 各種任務。"},
-    {w: "Patient", z: "病患", s: "The doctor was very kind to the [_____].", st: "醫生對 <span class='hl'>病患</span> 非常親切。"},
-    {w: "Initial", z: "最初的", s: "We had an [_____] meeting to discuss the project.", st: "我們開了一次 <span class='hl'>最初的</span> 會議來討論專案。"},
-    {w: "Trial", z: "試驗", s: "The new drug is currently in [_____]s.", st: "新藥目前正在進行 <span class='hl'>試驗</span>。"},
-    {w: "To facilitate", z: "促進", s: "These tools [_____] remote work.", st: "這些工具 <span class='hl'>促進</span> 了遠距工作。"},
-    {w: "Advances", z: "進展", s: "Recent [_____] in technology have improved our lives.", st: "最近科技的 <span class='hl'>進展</span> 改善了我們的生活。"},
-    {w: "Large language model", z: "大型語言模型", s: "ChatGPT is an example of a [_____].", st: "ChatGPT 是 <span class='hl'>大型語言模型</span> 的一個例子。"},
-    {w: "Artificial intelligence / AI", z: "人工智慧", s: "[_____] can help with tasks like data analysis.", st: "<span class='hl'>人工智慧</span> 可以協助數據分析等任務。"},
-    {w: "ChatGPT", z: "ChatGPT", s: "[_____] can help answer your questions.", st: "<span class='hl'>ChatGPT</span> 可以幫忙回答你的問題。"},
-    {w: "Interaction", z: "互動", s: "Our [_____] with the new system was smooth.", st: "我們與新系統的 <span class='hl'>互動</span> 很順暢。"},
-    {w: "Degree", z: "程度", s: "There is a high [_____] of trust in this technology.", st: "對這項技術有很高 <span class='hl'>程度</span> 的信任。"},
-    {w: "Menial", z: "卑微/枯燥的", s: "The robot handles [_____] tasks, freeing up workers for complex jobs.", st: "機器人處理 <span class='hl'>枯燥的</span> 任務，釋放了人力。"},
-    {w: "Field", z: "領域", s: "He is an expert in the [_____] of robotics.", st: "他是機器人 <span class='hl'>領域</span> 的專家。"},
-    {w: "To overshadow", z: "蓋過/使失色", s: "The new product [_____]ed last year’s model.", st: "新產品 <span class='hl'>蓋過</span> 了去年的型號。"},
-    {w: "To transform", z: "徹底改變", s: "AI has the potential [_____] many industries.", st: "AI 有潛力 <span class='hl'>徹底改變</span> 許多產業。"},
-    {w: "To adapt", z: "適應", s: "Businesses must [_____] to stay competitive.", st: "企業必須 <span class='hl'>適應</span> 以保持競爭力。"},
-    {w: "Real-world", z: "現實世界的", s: "We need [_____] solutions to these problems.", st: "我們需要針對這些問題的 <span class='hl'>現實世界</span> 解決方案。"},
-    {w: "Pre-programmed", z: "預先編程的", s: "The robot follows [_____] routines.", st: "機器人遵循 <span class='hl'>預先編程的</span> 程序。"},
-    {w: "Autonomously", z: "自主地", s: "The drone can fly [_____].", st: "無人機可以 <span class='hl'>自主</span> 飛行。"},
-    {w: "Reliable", z: "可靠的", s: "This system is very [_____] and rarely fails.", st: "該系統非常 <span class='hl'>可靠</span>，很少故障。"},
-    {w: "Algorithm", z: "演算法", s: "Search engines use complex [_____]s to find results.", st: "搜尋引擎使用複雜的 <span class='hl'>演算法</span> 來尋找結果。"},
-    {w: "The best of both worlds", z: "兩全其美", s: "This hybrid car offers [_____]: efficiency and power.", st: "這輛油電混合車提供了 <span class='hl'>兩全其美</span>：效率與動力。"},
-    {w: "Confined", z: "受限的", s: "The experiment was [_____] to the lab.", st: "實驗 <span class='hl'>受限</span> 於實驗室內。"},
-    {w: "Setting", z: "環境", s: "The conference took place in a formal [_____].", st: "會議在正式的 <span class='hl'>環境</span> 中舉行。"},
-    {w: "Crisis", z: "危機", s: "The company managed to survive the financial [_____].", st: "公司設法度過了財務 <span class='hl'>危機</span>。"},
-    {w: "To relieve", z: "減輕", s: "This medicine helps [_____] pain.", st: "這藥有助於 <span class='hl'>減輕</span> 疼痛。"},
-    {w: "Transition", z: "過渡", s: "The [_____] to remote work was smooth.", st: "向遠距工作的 <span class='hl'>轉變</span> 很順利。"},
-    {w: "Well into the future", z: "在未來很長一段時間", s: "These changes will affect us [_____].", st: "這些改變將 <span class='hl'>在未來很長一段時間</span> 影響我們。"},
-    {w: "Interference", z: "干擾", s: "[_____] in the system caused delays.", st: "系統中的 <span class='hl'>干擾</span> 導致了延誤。"},
-    {w: "To free up", z: "釋出", s: "Automating tasks can [_____] employees for more important work.", st: "自動化任務可以 <span class='hl'>釋出</span> 員工去做更重要的工作。"},
-    {w: "In short", z: "簡而言之", s: "[_____], we need to improve our processes.", st: "<span class='hl'>簡而言之</span>，我們需要改進我們的流程。"},
-    {w: "Work-life balance", z: "工作與生活平衡", s: "Flexible hours can improve [_____].", st: "彈性工時可以改善 <span class='hl'>工作與生活平衡</span>。"},
-    {w: "Game-changing", z: "顛覆性的", s: "This new technology is [_____] for the industry.", st: "這項新技術對產業來說是 <span class='hl'>顛覆性的</span>。"}
-];
-
 // ============================================
-// 全域變數 & 使用者狀態
+// 全域變數
 // ============================================
 let currentUser = "";
-let userQuizData = {}; // 儲存使用者的紀錄 { "題目": {marked: bool, wrong: bool} }
+let userQuizData = {}; 
 let currentQuiz = [];
 let currentIndex = 0;
 let score = 0;
 let currentMode = '';
 let isReviewMode = false;
 
-// 系統初始化
+// 頁面載入
 window.onload = function() {
     checkLogin();
 };
 
+// 渲染閱讀區
+function toggleReading(source) {
+    const displayArea = document.getElementById('reading-display-area');
+    const contentContainer = document.getElementById('reading-table-container');
+    const activeBtn = document.getElementById(`read-${source}-btn`);
+
+    // 如果點擊同一個按鈕且區域已開啟，則關閉
+    if (displayArea.style.display === 'block' && displayArea.dataset.source === source) {
+        closeReading();
+        return;
+    }
+
+    // 生成內容
+    let data = source === 'deepseek' ? database.deepseek : database.robots;
+    let title = source === 'deepseek' ? '📈 DeepSeek & AI 市場單字表' : '🤖 Robots & 自動化單字表';
+    let color = source === 'deepseek' ? '#28a745' : '#28a745';
+
+    let html = `<h3 style="color:${color};border-bottom:2px solid ${color};padding-bottom:10px;">${title}</h3>
+                <table class="vocab-table">
+                    <thead><tr><th>單字 / 詞彙</th><th>中文意思</th><th>例句與翻譯</th></tr></thead>
+                    <tbody>`;
+    
+    data.forEach(item => {
+        html += `<tr>
+            <td style="width:20%"><b>${item.w}</b></td>
+            <td style="width:15%">${item.z}</td>
+            <td>${item.s.replace('[_____]', `<u>${item.w}</u>`)}<br><span style="color:#555;font-size:0.9em;">${item.st}</span></td>
+        </tr>`;
+    });
+    html += `</tbody></table>`;
+
+    contentContainer.innerHTML = html;
+    displayArea.style.display = 'block';
+    displayArea.dataset.source = source;
+    
+    // 更新按鈕樣式
+    document.querySelectorAll('.read-btn').forEach(btn => btn.classList.remove('active'));
+    activeBtn.classList.add('active');
+    
+    // 平滑捲動到閱讀區
+    displayArea.scrollIntoView({behavior: "smooth", block: "start"});
+}
+
+function closeReading() {
+    document.getElementById('reading-display-area').style.display = 'none';
+    document.querySelectorAll('.read-btn').forEach(btn => btn.classList.remove('active'));
+}
+
+// 登入邏輯
 function checkLogin() {
     const storedUser = localStorage.getItem("lastUser");
     if (storedUser) {
@@ -453,12 +530,12 @@ function logout() {
     document.getElementById('menu-screen').style.display = 'none';
     document.getElementById('login-screen').style.display = 'block';
     document.getElementById('username').value = "";
+    closeReading();
 }
 
-// 雲端同步功能
+// 雲端同步
 function fetchUserData(name) {
-    if(!API_URL || API_URL.includes("XXXXXXXX")) {
-        alert("⚠️ 尚未設定 Google Script 網址，將使用本機暫存模式。");
+    if(!API_URL || API_URL.includes("REPLACE_WITH_API_URL")) {
         loadLocalData(name);
         return;
     }
@@ -498,18 +575,15 @@ function loadLocalData(name) {
 }
 
 function saveUserData() {
-    // 1. 存本機
     localStorage.setItem(`quizData_${currentUser}`, JSON.stringify(userQuizData));
-    
-    // 2. 存雲端 (如果已設定 API)
-    if(API_URL && !API_URL.includes("XXXXXXXX")) {
+    if(API_URL && !API_URL.includes("REPLACE_WITH_API_URL")) {
         fetch(API_URL, {
             method: 'POST',
             body: JSON.stringify({
                 name: currentUser,
                 data: JSON.stringify(userQuizData)
             })
-        }).then(res => console.log("Saved to cloud")).catch(err => console.error("Save failed", err));
+        }).catch(err => console.error("Save failed", err));
     }
 }
 
@@ -526,10 +600,7 @@ function updateUserQuestionState(qSentence, newState) {
     saveUserData();
 }
 
-// ============================================
 // 測驗邏輯
-// ============================================
-
 function showMenu() {
     document.getElementById('display-name').innerText = currentUser;
     document.getElementById('login-screen').style.display = 'none';
