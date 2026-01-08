@@ -31,10 +31,7 @@
     .section-divider { margin: 40px 0 20px; border-top: 1px solid #eee; position: relative; }
     .section-label { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: white; padding: 0 15px; color: #95a5a6; font-size: 0.9em; font-weight: bold; }
 
-    /* 按鈕網格 */
     .btn-grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); max-width: 800px; margin: 0 auto; }
-    
-    /* 測驗按鈕樣式 */
     .menu-btn { background: white; border: 2px solid #e0e0e0; padding: 30px; border-radius: 12px; cursor: pointer; transition: 0.3s; text-align: left; position: relative; }
     .menu-btn:hover { border-color: var(--accent); transform: translateY(-5px); box-shadow: 0 10px 20px rgba(52, 152, 219, 0.15); }
     .menu-btn h3 { margin: 0 0 10px 0; color: var(--accent); font-size: 1.4em; }
@@ -48,7 +45,7 @@
     .read-btn.active { background: #28a745; border-color: #28a745; }
     .read-btn.active h3, .read-btn.active p { color: white; }
 
-    /* 閱讀內容顯示區 */
+    /* 閱讀內容顯示區 (通用) */
     #reading-display-area { display: none; margin-top: 20px; text-align: left; animation: slideDown 0.3s ease; }
     .vocab-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 0.95em; }
     .vocab-table th, .vocab-table td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; vertical-align: top; }
@@ -113,7 +110,63 @@
     .home-btn { background: #95a5a6; color: white; border: none; padding: 15px 30px; font-size: 1.1em; border-radius: 10px; cursor: pointer; margin: 10px; transition: 0.3s; }
     .home-btn:hover { background: #7f8c8d; transform: translateY(-3px); }
 
-    @media (max-width: 700px) { .options-grid { grid-template-columns: 1fr; } .vocab-list { grid-template-columns: 1fr; } .header { padding: 15px; } }
+    /* ========================================= */
+    /* 📱 手機版閱讀區優化 (Mobile Card View) */
+    /* ========================================= */
+    @media (max-width: 700px) {
+        .options-grid { grid-template-columns: 1fr; }
+        .vocab-list { grid-template-columns: 1fr; }
+        .header { padding: 15px; }
+        
+        /* 閱讀區表格轉卡片 */
+        .vocab-table thead { display: none; } /* 隱藏表頭 */
+        .vocab-table, .vocab-table tbody, .vocab-table tr, .vocab-table td {
+            display: block; width: 100%; box-sizing: border-box;
+        }
+        .vocab-table tr {
+            margin-bottom: 20px;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            padding: 15px;
+        }
+        .vocab-table td {
+            padding: 5px 0;
+            border: none;
+        }
+        /* 單字 (第一欄) */
+        .vocab-table td:nth-child(1) {
+            font-size: 1.3em;
+            color: var(--primary);
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 8px;
+            margin-bottom: 8px;
+        }
+        /* 中文 (第二欄) */
+        .vocab-table td:nth-child(2) {
+            color: var(--accent);
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+        /* 例句 (第三欄) */
+        .vocab-table td:nth-child(3) {
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 6px;
+            color: #555;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+    }
+    
+    /* 電腦版表格欄位寬度 */
+    @media (min-width: 701px) {
+        .vocab-table td:nth-child(1) { width: 20%; font-weight: bold; color: var(--primary); }
+        .vocab-table td:nth-child(2) { width: 20%; color: var(--accent); }
+    }
+
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes slideDown { from { opacity: 0; max-height: 0; } to { opacity: 1; max-height: 4000px; } }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -257,7 +310,7 @@ const database = {
     deepseek: [
         {w: "Artificial Intelligence", z: "人工智慧", s: "[_____] helps businesses automate customer service through chatbots.", st: "<span class='hl'>人工智慧</span> 幫助企業透過聊天機器人自動化客戶服務。"},
         {w: "To make waves", z: "引起轟動", s: "The new AI company is [_____] with its groundbreaking technology.", st: "這家新 AI 公司憑藉其突破性技術在業界 <span class='hl'>引起轟動</span>。"},
-        {w: "DeepSeek", z: "DeepSeek (公司名)", s: "[_____] has introduced a powerful AI model that challenges industry leaders.", st: "<span class='hl'>DeepSeek</span> 推出了一款強大的 AI 模型，挑戰了行業領導者。"},
+        {w: "DeepSeek", z: "DeepSeek (公司名)", s: "[_____] has introduced a powerful AI model that challenges industry leaders.", st: "<span class='hl'>DeepSeek</span> 推出了一款強大的 AI 模型，挑戰行業領導者。"},
         {w: "Lab", z: "實驗室", s: "The AI [_____] is working on new algorithms to improve machine learning.", st: "該 AI <span class='hl'>實驗室</span> 正在研究新算法以改進機器學習。"},
         {w: "To upend expectations", z: "顛覆預期", s: "DeepSeek’s new AI model has [_____] in the tech world.", st: "DeepSeek 的新 AI 模型 <span class='hl'>顛覆了預期</span>。"},
         {w: "To draw attention", z: "吸引注意", s: "The startup [_____] after announcing a major breakthrough in AI.", st: "這家新創公司在宣布 AI 的重大突破後 <span class='hl'>吸引了注意</span>。"},
@@ -277,7 +330,6 @@ const database = {
         {w: "Ambitions", z: "雄心/野心", s: "The company’s [_____] include becoming a leader in AI research.", st: "該公司的 <span class='hl'>雄心</span> 包括成為 AI 研究的領導者。"},
         {w: "Founded", z: "創立", s: "DeepSeek was [_____] by a group of AI researchers in China.", st: "DeepSeek 是由中國的一群 AI 研究人員 <span class='hl'>創立</span> 的。"},
         {w: "Hedge fund", z: "對沖基金", s: "The [_____] invested millions in AI startups.", st: "該 <span class='hl'>對沖基金</span> 向 AI 新創公司投資了數百萬美元。"},
-        {w: "R1 model", z: "R1 模型", s: "The [_____] has shown impressive language processing capabilities.", st: "<span class='hl'>R1 模型</span> 展現了令人印象深刻的語言處理能力。"},
         {w: "Paper", z: "論文", s: "Their [_____] on AI ethics was widely discussed in the tech community.", st: "他們關於 AI 倫理的 <span class='hl'>論文</span> 在科技界引起了廣泛討論。"},
         {w: "Large language model", z: "大型語言模型", s: "GPT-4 is a well-known [_____] used for various applications.", st: "GPT-4 是一個著名的、用於各種應用的 <span class='hl'>大型語言模型</span>。"},
         {w: "Bootstrapped", z: "白手起家", s: "The startup was [_____] for years before receiving funding.", st: "這家新創公司在獲得融資前，多年來一直靠 <span class='hl'>自籌資金</span> 運作。"},
