@@ -37,7 +37,7 @@
     .menu-btn h3 { margin: 0 0 10px 0; color: var(--accent); font-size: 1.4em; }
     .menu-btn p { margin: 0; color: #95a5a6; }
 
-    /* 閱讀區按鈕樣式 */
+    /* 閱讀區按鈕 */
     .read-btn { background: #f9fff9; border: 2px solid #c3e6cb; padding: 20px; border-radius: 12px; cursor: pointer; transition: 0.3s; text-align: left; }
     .read-btn:hover { border-color: #28a745; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(40, 167, 69, 0.1); background: #f0fff4; }
     .read-btn h3 { margin: 0 0 5px 0; color: #28a745; font-size: 1.2em; display: flex; align-items: center; gap: 10px; }
@@ -45,7 +45,7 @@
     .read-btn.active { background: #28a745; border-color: #28a745; }
     .read-btn.active h3, .read-btn.active p { color: white; }
 
-    /* 閱讀內容顯示區 (通用) */
+    /* 閱讀內容顯示區 */
     #reading-display-area { display: none; margin-top: 20px; text-align: left; animation: slideDown 0.3s ease; }
     .vocab-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 0.95em; }
     .vocab-table th, .vocab-table td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; vertical-align: top; }
@@ -111,47 +111,61 @@
     .home-btn:hover { background: #7f8c8d; transform: translateY(-3px); }
 
     /* ========================================= */
-    /* 📱 手機版閱讀區優化 (Mobile Card View) */
+    /* 📱 手機版樣式優化 (關鍵修正) */
     /* ========================================= */
     @media (max-width: 700px) {
+        .container { padding: 10px; min-height: 100vh; }
         .options-grid { grid-template-columns: 1fr; }
         .vocab-list { grid-template-columns: 1fr; }
         .header { padding: 15px; }
         
-        /* 閱讀區表格轉卡片 */
-        .vocab-table thead { display: none; } /* 隱藏表頭 */
+        /* 閱讀區：強制轉為卡片模式，不再使用表格佈局 */
         .vocab-table, .vocab-table tbody, .vocab-table tr, .vocab-table td {
-            display: block; width: 100%; box-sizing: border-box;
+            display: block; 
+            width: 100% !important; 
+            box-sizing: border-box;
         }
+        
+        /* 隱藏表頭 */
+        .vocab-table thead { display: none; }
+        
+        /* 每一列變成一張卡片 */
         .vocab-table tr {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             background: #fff;
             border: 1px solid #e0e0e0;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             padding: 15px;
         }
+        
+        /* 每個單元格的樣式 */
         .vocab-table td {
-            padding: 5px 0;
-            border: none;
+            padding: 8px 0;
+            border-bottom: 1px dashed #eee;
         }
-        /* 單字 (第一欄) */
+        
+        .vocab-table td:last-child {
+            border-bottom: none;
+        }
+
+        /* 第一欄：單字 (加大加粗) */
         .vocab-table td:nth-child(1) {
             font-size: 1.3em;
             color: var(--primary);
-            border-bottom: 1px solid #f0f0f0;
-            padding-bottom: 8px;
-            margin-bottom: 8px;
+            font-weight: 800;
         }
-        /* 中文 (第二欄) */
+
+        /* 第二欄：中文意思 (醒目顏色) */
         .vocab-table td:nth-child(2) {
             color: var(--accent);
-            font-weight: bold;
-            margin-bottom: 8px;
+            font-weight: 600;
             font-size: 1.1em;
         }
-        /* 例句 (第三欄) */
+
+        /* 第三欄：例句 (灰色背景區塊) */
         .vocab-table td:nth-child(3) {
+            margin-top: 5px;
             background: #f9f9f9;
             padding: 10px;
             border-radius: 6px;
@@ -160,8 +174,8 @@
             line-height: 1.5;
         }
     }
-    
-    /* 電腦版表格欄位寬度 */
+
+    /* 電腦版樣式維持 */
     @media (min-width: 701px) {
         .vocab-table td:nth-child(1) { width: 20%; font-weight: bold; color: var(--primary); }
         .vocab-table td:nth-child(2) { width: 20%; color: var(--accent); }
